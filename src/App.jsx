@@ -33,14 +33,18 @@ function App() {
     CLIENT_ID = document.getElementById('client_id').value
     API_KEY = document.getElementById('api_key').value
 
-    gapi.load('client', initializeGapiClient);
+    if (gapiLoaded && gisLoaded) {
+      gapi.load('client', initializeGapiClient);
 
-    tokenClient = google.accounts.oauth2.initTokenClient({
-      client_id: CLIENT_ID,
-      scope: SCOPES,
-    });
-    gisInited = true;
-    maybeEnableButtons();
+      tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: CLIENT_ID,
+        scope: SCOPES,
+      });
+      gisInited = true;
+      maybeEnableButtons();
+    } else {
+      alert('gapi or gis is not inited')
+    }
   }
 
   async function initializeGapiClient() {
