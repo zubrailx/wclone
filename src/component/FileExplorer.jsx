@@ -1,5 +1,5 @@
-import { listFiles } from "./backend/gdrive";
-import { encrypt, decrypt } from "./cypher/aes";
+import { listFiles } from "../backend/gdrive";
+import { encrypt, decrypt } from "../cypher/aes";
 
 function FileExplorer() {
   async function handleListClick() {

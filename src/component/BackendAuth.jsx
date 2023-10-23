@@ -1,4 +1,4 @@
-import { load, init, revoke } from "./backend/gdrive";
+import { load, init, revoke } from "../backend/gdrive";
 import { onMount } from "solid-js";
 
 function BackendAuth() {

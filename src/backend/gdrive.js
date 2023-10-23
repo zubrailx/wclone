@@ -1,4 +1,4 @@
-import { loadScript } from "../util";
+import { loadScript } from "../utils";
 
 const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest';
 const SCOPES = 'https://www.googleapis.com/auth/drive';
