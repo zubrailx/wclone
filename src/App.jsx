@@ -1,93 +1,41 @@
 import { createSignal, onMount, For } from "solid-js";
-import { loadScript } from "./util";
-import { listFiles } from "./gdrive";
 import './App.scss'
+import { load, init, revoke, listFiles } from "./backend/gdrive";
+import { encrypt, decrypt } from "./cypher/aes";
 
 function App() {
-  const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest';
-  const SCOPES = 'https://www.googleapis.com/auth/drive';
-  let CLIENT_ID;
-  let API_KEY;
-
-  let tokenClient;
-  let gapiLoaded = false;
-  let gisLoaded = false;
-
-  let gapiInited = false;
-  let gisInited = false;
-
-  onMount(async () => {
-    loadScript("https://apis.google.com/js/api.js", loadGapi)
-    loadScript("https://accounts.google.com/gsi/client", loadGis)
+  onMount(() => {
+    load();
   })
 
-  function loadGapi() {
-    gapiLoaded = true;
+  function enableButtons() {
+    document.getElementById('signout_button').style.visibility = 'visible';
   }
 
-  function loadGis() {
-    gisLoaded = true;
+  function disableButtons() {
+    document.getElementById('content').innerText = '';
+    document.getElementById('signout_button').style.visibility = 'hidden';
   }
 
-  function loadClient() {
-    CLIENT_ID = document.getElementById('client_id').value
-    API_KEY = document.getElementById('api_key').value
+  function signIn() {
+    let client_id = document.getElementById('client_id').value;
+    let api_key = document.getElementById('api_key').value;
 
-    if (gapiLoaded && gisLoaded) {
-      gapi.load('client', initializeGapiClient);
-
-      tokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: CLIENT_ID,
-        scope: SCOPES,
-      });
-      gisInited = true;
-      maybeEnableButtons();
-    } else {
-      alert('gapi or gis is not inited')
-    }
+    init(client_id, api_key)
+      .then(() => enableButtons());
   }
 
-  async function initializeGapiClient() {
-    await gapi.client.init({
-      apiKey: API_KEY,
-      discoveryDocs: [DISCOVERY_DOC],
-    });
-    gapiInited = true;
-    maybeEnableButtons();
+  function signOut() {
+    revoke()
+      .then(() => disableButtons());
   }
 
-  function maybeEnableButtons() {
-    if (gapiInited && gisInited) {
-      document.getElementById('authorize_button').style.visibility = 'visible';
-
-    }
-  }
-
-  function handleAuthClick() {
-    tokenClient.callback = async (resp) => {
-      if (resp.error !== undefined) {
-        throw (resp);
-      }
-      document.getElementById('signout_button').style.visibility = 'visible';
-      document.getElementById('authorize_button').innerText = 'Refresh';
-      await listFiles();
-    };
-
-    if (gapi.client.getToken() === null) {
-      tokenClient.requestAccessToken({ prompt: 'consent' });
-    } else {
-      tokenClient.requestAccessToken({ prompt: '' });
-    }
-  }
-
-  function handleSignoutClick() {
-    const token = gapi.client.getToken();
-    if (token !== null) {
-      google.accounts.oauth2.revoke(token.access_token);
-      gapi.client.setToken('');
-      document.getElementById('content').innerText = '';
-      document.getElementById('authorize_button').innerText = 'Authorize';
-      document.getElementById('signout_button').style.visibility = 'hidden';
+  async function handleListClick() {
+    let files = await listFiles(10, "parents in 'root'");
+    document.getElementById("content").innerHTML = ''
+    for (let file of files) {
+      document.getElementById("content").innerHTML += 
+        '<p>' + JSON.stringify(file) + '</p>'
     }
   }
 
@@ -102,11 +50,11 @@ function App() {
           API Key:
           <input type="text" id="api_key" value="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" />
         </div>
-        <button id="load_client" onClick={loadClient}>Load client</button>
+        <button id="init_client" onClick={signIn}>Sign in</button>
+        <button id="signout_button" onClick={signOut}>Sign Out</button>
       </div >
       <div>
-        <button id="authorize_button" onClick={handleAuthClick}>Authorize</button>
-        <button id="signout_button" onClick={handleSignoutClick}>Sign Out</button>
+        <button id="list_files_button" onClick={handleListClick}>List files</button>
         <div id="content"></div>
         <form className='upload'>
           <div>
