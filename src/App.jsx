@@ -4,22 +4,43 @@ import { listFiles } from "./gdrive";
 import './App.scss'
 
 function App() {
-  const CLIENT_ID = '695678300880-k19jfgsgnob6fil49kpilb3r04aior9v.apps.googleusercontent.com';
-  const API_KEY = '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';
   const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest';
   const SCOPES = 'https://www.googleapis.com/auth/drive';
+  let CLIENT_ID;
+  let API_KEY;
 
   let tokenClient;
+  let gapiLoaded = false;
+  let gisLoaded = false;
+
   let gapiInited = false;
   let gisInited = false;
 
   onMount(async () => {
-    loadScript("https://apis.google.com/js/api.js", gapiLoaded)
-    loadScript("https://accounts.google.com/gsi/client", gisLoaded)
+    loadScript("https://apis.google.com/js/api.js", loadGapi)
+    loadScript("https://accounts.google.com/gsi/client", loadGis)
   })
 
-  function gapiLoaded() {
+  function loadGapi() {
+    gapiLoaded = true;
+  }
+
+  function loadGis() {
+    gisLoaded = true;
+  }
+
+  function loadClient() {
+    CLIENT_ID = document.getElementById('client_id').value
+    API_KEY = document.getElementById('api_key').value
+
     gapi.load('client', initializeGapiClient);
+
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: CLIENT_ID,
+      scope: SCOPES,
+    });
+    gisInited = true;
+    maybeEnableButtons();
   }
 
   async function initializeGapiClient() {
@@ -31,19 +52,10 @@ function App() {
     maybeEnableButtons();
   }
 
-  function gisLoaded() {
-    tokenClient = google.accounts.oauth2.initTokenClient({
-      client_id: CLIENT_ID,
-      scope: SCOPES,
-      callback: '', // defined later
-    });
-    gisInited = true;
-    maybeEnableButtons();
-  }
-
   function maybeEnableButtons() {
     if (gapiInited && gisInited) {
       document.getElementById('authorize_button').style.visibility = 'visible';
+
     }
   }
 
@@ -77,16 +89,30 @@ function App() {
 
   return (
     <>
-      <h1>wclone</h1>
-      <button id="authorize_button" onClick={handleAuthClick}>Authorize</button>
-      <button id="signout_button" onClick={handleSignoutClick}>Sign Out</button>
-      <br />
-      <div id="content"></div>
-      <form className='upload'>
-        <input type="file" name="uploadFile" required />
-        <br />
-        <input type="submit" />
-      </form>
+      <div>
+        <div>
+          Client ID:
+          <input type="text" id="client_id" value="695678300880-k19jfgsgnob6fil49kpilb3r04aior9v.apps.googleusercontent.com" />
+        </div>
+        <div>
+          API Key:
+          <input type="text" id="api_key" value="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" />
+        </div>
+        <button id="load_client" onClick={loadClient}>Load client</button>
+      </div >
+      <div>
+        <button id="authorize_button" onClick={handleAuthClick}>Authorize</button>
+        <button id="signout_button" onClick={handleSignoutClick}>Sign Out</button>
+        <div id="content"></div>
+        <form className='upload'>
+          <div>
+            <input type="file" name="uploadFile" required />
+          </div>
+          <div>
+            <input type="submit" />
+          </div>
+        </form>
+      </div>
     </>
   )
 }
