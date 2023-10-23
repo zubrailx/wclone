@@ -101,12 +101,13 @@ function App() {
       <div>
       </div>
       <h1>wclone</h1>
-      <button id="authorize_button" onClick={handleAuthClick} visibility="hidden">Authorize</button>
-      <button id="signout_button" onClick={handleSignoutClick} visibility="hidden">Sign Out</button>
-      <pre id="content" style="white-space: pre-wrap;"></pre>
+      <button id="authorize_button" onClick={handleAuthClick}>Authorize</button>
+      <button id="signout_button" onClick={handleSignoutClick}>Sign Out</button>
+      <br />
+      <div id="content"></div>
       <form className='upload'>
         <input type="file" name="uploadFile" required />
-        <br /><br />
+        <br />
         <input type="submit" />
       </form>
     </>
