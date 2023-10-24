@@ -2,7 +2,7 @@ import { For, createSignal } from "solid-js";
 import { DriveFile } from "../backend/base.js";
 import { useDriveCtx } from "./DriveProvider.jsx";
 
-function FileExplorer() {
+function RemoteExplorer() {
   const [ctx, _] = useDriveCtx();
   const [files, changeFiles] = createSignal<DriveFile[]>([]);
   const [query, changeQuery] = createSignal("parents in 'root'");
@@ -26,18 +26,10 @@ function FileExplorer() {
             }</For>
           </table>
         </div>
-        <form class='upload'>
-          <div>
-            <input type="file" name="uploadFile" required />
-          </div>
-          <div>
-            <input type="submit" />
-          </div>
-        </form>
       </div>
     </>
   )
 
 }
 
-export default FileExplorer
+export default RemoteExplorer

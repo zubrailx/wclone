@@ -1,16 +1,18 @@
 import './App.scss'
 
-import FileExplorer from "./FileExplorer.jsx";
 import BackendAuth from "./BackendAuth.jsx";
 import { DriveProvider } from './DriveProvider.jsx';
 import { GDriveCtx } from '../backend/gdrive.js';
+import RemoteExplorer from './RemoteExplorer.jsx';
+import LocalExplorer from './LocalExplorer.jsx';
 
 
 function App() {
   return (
     <DriveProvider ctx={new GDriveCtx()} >
       <BackendAuth />
-      <FileExplorer />
+      <RemoteExplorer />
+      <LocalExplorer />
     </DriveProvider>
   )
 }
