@@ -10,15 +10,16 @@ function LocalExplorer() {
   let inputFile: any;
   let divRows: any;
   let contextMenu: any;
+  let root: any;
 
   onMount(() => {
-    window.addEventListener('contextmenu', handleContextMenu);
-    window.addEventListener('click', handleMouseClick);
+    root.addEventListener('contextmenu', handleContextMenu);
+    root.addEventListener('click', handleMouseClick);
   })
 
   onCleanup(() => {
-    window.removeEventListener('contextmenu', handleContextMenu);
-    window.removeEventListener('click', handleMouseClick);
+    root.removeEventListener('contextmenu', handleContextMenu);
+    root.removeEventListener('click', handleMouseClick);
   })
 
   function handleContextMenu(e: MouseEvent) {
@@ -69,7 +70,7 @@ function LocalExplorer() {
 
   return (
     <>
-      <div class='localfile'>
+      <div ref={root} class='localfile'>
         <input type="file" ref={inputFile} onChange={inputFileOnChange} value="Upload" multiple />
         <div ref={divRows} class='table'>
           <For each={files()}>{(file, i) =>
