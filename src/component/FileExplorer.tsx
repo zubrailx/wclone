@@ -1,13 +1,14 @@
 import { For, createSignal } from "solid-js";
-import { File, listFiles } from "../backend/gdrive.js";
-import { encrypt, decrypt } from "../cypher/aes.js";
+import { DriveFile } from "../operation/init.jsx";
+import { useDriveCtx } from "./DriveProvider.jsx";
 
 function FileExplorer() {
-  const [files, changeFiles] = createSignal<File[]>([]);
+  const [ctx, _] = useDriveCtx();
+  const [files, changeFiles] = createSignal<DriveFile[]>([]);
   const [query, changeQuery] = createSignal("parents in 'root'");
 
   async function handleListClick() {
-    changeFiles(await listFiles(10, query()));
+    changeFiles(await ctx.ls(10, query()));
   }
 
   return (
@@ -18,8 +19,9 @@ function FileExplorer() {
           <table class="driveList">
             <For each={files()}>{(file, i) =>
               <tr>
-                <td>{file.name}</td>
-                <td>{file.createdTime.toLocaleString()}</td>
+                <td>{file.getName()}</td>
+                <td>{file.getCreatedTime().toLocaleString()}</td>
+                <td>{file.getMimeType().toLocaleString()}</td>
               </tr>
             }</For>
           </table>

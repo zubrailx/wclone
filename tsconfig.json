@@ -5,6 +5,7 @@
     "module": "ESNext",
     "moduleResolution": "nodenext",
     "allowSyntheticDefaultImports": true,
+    "strictPropertyInitialization": false,
     "esModuleInterop": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",

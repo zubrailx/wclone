@@ -1,9 +1,14 @@
-import { load, init, revoke } from "../backend/gdrive.js";
 import { createSignal, onMount } from "solid-js";
+import { useDriveCtx } from "./DriveProvider.jsx";
+import { produce } from "solid-js/store";
 
 function BackendAuth() {
+  const [_, setCtx] = useDriveCtx()
+
   onMount(() => {
-    load();
+    setCtx(produce(ctx => {
+      ctx.load();
+    }));
   })
 
   let [isSignedIn, setIsSignIn] = createSignal(false);
@@ -15,17 +20,21 @@ function BackendAuth() {
     let client_id = clientId.value;
     let api_key = apiKey.value;
 
-    init(client_id, api_key)
-      .then(() => {
-        setIsSignIn(true);
-      });
+    setCtx(produce(ctx => {
+      ctx.init(client_id, api_key)
+        .then(() => {
+          setIsSignIn(true);
+        });
+    }))
   }
 
   function signOut() {
-    revoke()
-      .then(() => {
-        setIsSignIn(false);
-      });
+    setCtx(produce(ctx => {
+      ctx.revoke()
+        .then(() => {
+          setIsSignIn(false);
+        });
+    }))
   }
 
   return (
