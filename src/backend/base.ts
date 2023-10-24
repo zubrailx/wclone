@@ -6,6 +6,8 @@ export interface DriveFile {
 };
 
 export interface DriveCtx {
+  isLogged(): boolean;
+
   load(): void;
   init(client_id: String, api_key: String): Promise<void>;
   revoke(): Promise<void>;

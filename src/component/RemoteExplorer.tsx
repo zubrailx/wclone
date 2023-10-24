@@ -1,4 +1,4 @@
-import { For, createSignal, onCleanup, onMount } from "solid-js";
+import { For, createEffect, createSignal, onCleanup, onMount } from "solid-js";
 import { DriveFile } from "../backend/base.js";
 import { useDriveCtx } from "./DriveProvider.jsx";
 import { matchesClassNames } from "../utils.js";
@@ -21,6 +21,12 @@ function RemoteExplorer() {
     root.removeEventListener('contextmenu', handleContextMenu);
     root.removeEventListener('click', handleMouseClick);
   })
+
+  createEffect(() => {
+    if (ctx.isLogged() == false) {
+      changeFiles((_) => []);
+    }
+  });
 
   function handleContextMenu(e: MouseEvent) {
     e.preventDefault();

@@ -50,6 +50,12 @@ export class GDriveCtx implements DriveCtx {
   gapiInited = false;
   gisInited = false;
 
+  logged = false;
+
+  isLogged(): boolean {
+    return this.logged;
+  }
+
   load(): void {
     loadScript("https://apis.google.com/js/api.js", () => {
       this.gapiLoaded = true;
@@ -81,10 +87,11 @@ export class GDriveCtx implements DriveCtx {
           self.gapiInited = true;
 
           if (gapi.client.getToken() === null) {
-            self.tokenClient.requestAccessToken({ prompt: 'consent' });
+            await self.tokenClient.requestAccessToken({ prompt: 'consent' });
           } else {
-            self.tokenClient.requestAccessToken({ prompt: '' });
+            await self.tokenClient.requestAccessToken({ prompt: '' });
           }
+          self.logged = true;
         }
       });
     } else {
@@ -98,6 +105,7 @@ export class GDriveCtx implements DriveCtx {
       await google.accounts.oauth2.revoke(token.access_token);
       await gapi.client.setToken('');
     }
+    this.logged = false;
   }
 
   public async ls(pageSize: number, query: string): Promise<GDriveFile[]> {
