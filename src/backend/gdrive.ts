@@ -1,5 +1,5 @@
 import { loadScript } from "../utils.js";
-import { DriveFile, DriveCtx } from "../operation/init.jsx";
+import { DriveFile, DriveCtx } from "./base.js";
 
 declare var gapi: any;
 declare var google: any;
