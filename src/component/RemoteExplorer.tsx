@@ -1,11 +1,11 @@
 import { For, createEffect, createSignal, onCleanup, onMount } from "solid-js";
-import { DriveFile } from "../backend/base.js";
+import { DriveFileInfo } from "../backend/base.js";
 import { useDriveCtx } from "./DriveProvider.jsx";
 import { matchesClassNames } from "../utils.js";
 
 function RemoteExplorer() {
   const [ctx, _] = useDriveCtx();
-  const [files, changeFiles] = createSignal<DriveFile[]>([]);
+  const [files, changeFiles] = createSignal<DriveFileInfo[]>([]);
   const [query, changeQuery] = createSignal("parents in 'root'");
   const [CMVisible, setCMVisible] = createSignal(false);
 

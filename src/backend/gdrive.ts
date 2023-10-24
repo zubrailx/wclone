@@ -1,10 +1,10 @@
 import { loadScript } from "../utils.js";
-import { DriveFile, DriveCtx } from "./base.js";
+import { DriveFileInfo as DriveFileMeta, DriveCtx } from "./base.js";
 
 declare var gapi: any;
 declare var google: any;
 
-class GDriveFile implements DriveFile {
+class GDriveFileMeta implements DriveFileMeta {
   id: string;
   name: string;
   size: number;
@@ -108,7 +108,7 @@ export class GDriveCtx implements DriveCtx {
     this.logged = false;
   }
 
-  public async ls(pageSize: number, query: string): Promise<GDriveFile[]> {
+  public async ls(pageSize: number, query: string): Promise<GDriveFileMeta[]> {
     let response;
     response = await gapi.client.drive.files.list({
       'pageSize': pageSize,
@@ -116,7 +116,7 @@ export class GDriveCtx implements DriveCtx {
       'fields': 'files(id, name, size, mimeType, createdTime)',
     });
     return response.result.files.map(
-      (file: any) => new GDriveFile(file.id, file.name, file.size, file.mimeType, new Date(file.createdTime))
+      (file: any) => new GDriveFileMeta(file.id, file.name, file.size, file.mimeType, new Date(file.createdTime))
     );
   }
 }
