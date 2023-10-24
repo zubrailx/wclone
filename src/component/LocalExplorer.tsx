@@ -25,8 +25,7 @@ function LocalExplorer() {
   function handleContextMenu(e: MouseEvent) {
     e.preventDefault();
     var pe = document.elementsFromPoint(e.clientX, e.clientY);
-    console.log(pe);
-    if (matchesClassNames(pe, ['cell'])) {
+    if (matchesClassNames(pe, ['localfile', 'cell'])) {
       const attrVal = pe[0].getAttribute('data-idx');
       if (attrVal !== null) {
         closeContextMenu();
@@ -68,6 +67,10 @@ function LocalExplorer() {
     setCMVisible(false);
   }
 
+  function hello() {
+    setCMVisible(false);
+  }
+
   return (
     <>
       <div ref={root} class='localfile'>
@@ -84,19 +87,19 @@ function LocalExplorer() {
         </div>
       </div>
       <div ref={contextMenu} class='contextmenu' style={{ visibility: CMVisible() ? 'visible' : 'hidden' }}>
-        <div class='element'>
+        <div onClick={hello} class='element'>
           <span>Upload</span>
         </div>
-        <div class='element'>
+        <div onClick={hello} class='element'>
           <span>Download</span>
         </div>
-        <div class='element'>
+        <div onClick={hello} class='element'>
           <span>Remove</span>
         </div>
-        <div class='element'>
+        <div onClick={hello} class='element'>
           <span>Encrypt</span>
         </div>
-        <div class='element'>
+        <div onClick={hello} class='element'>
           <span>Decrypt</span>
         </div>
       </div>
