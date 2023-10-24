@@ -1,8 +1,10 @@
 import { render } from 'solid-js/web'
 
 import './index.css'
-import App from './component/App'
+import App from './component/App.jsx'
 
 const root = document.getElementById('root')
 
-render(() => <App />, root)
+if (root !== null) {
+  render(() => <App />, root)
+}

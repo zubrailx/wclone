@@ -1,12 +1,29 @@
-import { loadScript } from "../utils";
+import { loadScript } from "../utils.js";
+
+declare var gapi: any;
+declare var google: any;
+
+export class File {
+  id: string;
+  name: string;
+  mimeType: string;
+  createdTime: Date;
+
+  constructor(id: string, name: string, mimeType: string, createdTime: Date) {
+    this.id = id;
+    this.name = name;
+    this.mimeType = mimeType;
+    this.createdTime = createdTime;
+  }
+};
 
 const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest';
 const SCOPES = 'https://www.googleapis.com/auth/drive';
 
-let CLIENT_ID;
-let API_KEY;
+let CLIENT_ID: String;
+let API_KEY: String;
 
-let tokenClient;
+let tokenClient: any;
 let gapiLoaded = false;
 let gisLoaded = false;
 
@@ -26,7 +43,7 @@ function loadGis() {
   gisLoaded = true;
 }
 
-export async function init(client_id, api_key) {
+export async function init(client_id: String, api_key: String) {
   CLIENT_ID = client_id
   API_KEY = api_key
 
@@ -69,13 +86,16 @@ export async function revoke() {
   }
 }
 
-export async function listFiles(pageSize, q) {
+export async function listFiles(pageSize: number, q: String) {
   let response;
   response = await gapi.client.drive.files.list({
     'pageSize': pageSize,
     'q': q,
-    'fields': 'files(id, name, createdTime, mimeType)',
+    'fields': 'files(id, name, mimeType, createdTime)',
   });
-  return response.result.files;
+  let res: File[] = response.result.files.map(
+    (file: any) => new File(file.id, file.name, file.mimeType, new Date(file.createdTime))
+  );
+  return res;
 }
 

@@ -1,7 +1,7 @@
 import './App.scss'
 
-import FileExplorer from "./FileExplorer";
-import BackendAuth from "./BackendAuth";
+import FileExplorer from "./FileExplorer.jsx";
+import BackendAuth from "./BackendAuth.jsx";
 
 
 function App() {
