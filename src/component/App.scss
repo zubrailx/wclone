@@ -6,3 +6,49 @@
   visibility: hidden;
 };
 
+.table {
+  .row {
+    cursor: context-menu;
+    .cell {
+      border-style: solid;
+      border-width: 1px 0px 0px 1px;
+    }
+    .cell:last-child {
+      border-width: 1px 1px 0px 1px;
+    }
+
+  }
+  .row:last-child {
+    .cell {
+      border-style: solid;
+      border-width: 1px 0px 1px 1px;
+    }
+    .cell:last-child {
+      border-width: 1px 1px 1px 1px;
+    }
+  }
+}
+
+.contextmenu {
+  width: max-content;
+  position: absolute;
+  z-index: 10;
+  background-color: white;
+
+  div {
+    padding: 2px;
+    border: solid;
+    border-width: 1px 1px 0px 1px;
+    opacity: 1;
+  }
+
+  div:last-child {
+    border-width: 1px 1px 1px 1px;
+  }
+
+  div:hover {
+    background-color: rgb(240, 240, 240);
+    cursor: pointer;
+  }
+}
+

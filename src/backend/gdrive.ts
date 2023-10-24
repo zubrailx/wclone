@@ -7,18 +7,24 @@ declare var google: any;
 class GDriveFile implements DriveFile {
   id: string;
   name: string;
+  size: number;
   mimeType: string;
   createdTime: Date;
 
-  constructor(id: string, name: string, mimeType: string, createdTime: Date) {
+  constructor(id: string, name: string, size: number, mimeType: string, createdTime: Date) {
     this.id = id;
     this.name = name;
+    this.size = size;
     this.mimeType = mimeType;
     this.createdTime = createdTime;
   }
 
   getName(): string {
     return this.name;
+  }
+
+  getSize(): number {
+    return this.size;
   }
 
   getMimeType(): string {
@@ -99,10 +105,10 @@ export class GDriveCtx implements DriveCtx {
     response = await gapi.client.drive.files.list({
       'pageSize': pageSize,
       'q': query,
-      'fields': 'files(id, name, mimeType, createdTime)',
+      'fields': 'files(id, name, size, mimeType, createdTime)',
     });
     return response.result.files.map(
-      (file: any) => new GDriveFile(file.id, file.name, file.mimeType, new Date(file.createdTime))
+      (file: any) => new GDriveFile(file.id, file.name, file.size, file.mimeType, new Date(file.createdTime))
     );
   }
 }

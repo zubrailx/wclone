@@ -13,18 +13,17 @@ function RemoteExplorer() {
 
   return (
     <>
-      <div>
-        <button id="list_files_button" onClick={handleListClick}>List files</button>
-        <div id="content">
-          <table class="driveList">
-            <For each={files()}>{(file, i) =>
-              <tr>
-                <td>{file.getName()}</td>
-                <td>{file.getCreatedTime().toLocaleString()}</td>
-                <td>{file.getMimeType().toLocaleString()}</td>
-              </tr>
-            }</For>
-          </table>
+      <div class='remotefile'>
+        <button onClick={handleListClick}>List files</button>
+        <div class='table'>
+          <For each={files()}>{(file, i) =>
+            <tr class='row'>
+              <td class='cell'>{file.getName()}</td>
+              <td class='cell'>{file.getSize()}</td>
+              <td class='cell'>{file.getCreatedTime().toLocaleString()}</td>
+              <td class='cell'>{file.getMimeType().toLocaleString()}</td>
+            </tr>
+          }</For>
         </div>
       </div>
     </>

@@ -1,5 +1,6 @@
 export interface DriveFile {
   getName(): string;
+  getSize(): number;
   getMimeType(): string;
   getCreatedTime(): Date;
 };
