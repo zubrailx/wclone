@@ -1,4 +1,4 @@
-export function loadScript(src, onLoad) {
+export function loadScript(src: string, onLoad: () => void) {
   let script = document.createElement('script');
   script.src = src;
   script.async = true;
