@@ -1,26 +1,36 @@
-import { For, createEffect, createSignal, onCleanup, onMount } from "solid-js";
+import { For, createEffect, createSignal, onCleanup } from "solid-js";
 import { DriveFileInfo } from "../backend/base.js";
 import { useDriveCtx } from "./DriveProvider.jsx";
-import { matchesClassNames } from "../utils.js";
+import RemoteContextMenu from "./RemoteContextMenu.jsx";
+
+const NOT_SELECTED = -1;
+
+function log(...msg: any) {
+  return console.log('[RemoteExplorer]:', ...msg)
+}
 
 function RemoteExplorer() {
   const [ctx, _] = useDriveCtx();
+  const [selFile, setSelFile] = createSignal(NOT_SELECTED);
   const [files, changeFiles] = createSignal<DriveFileInfo[]>([]);
   const [query, changeQuery] = createSignal("parents in 'root'");
-  const [CMVisible, setCMVisible] = createSignal(false);
+  const [contextMenu, setContextMenu] = createSignal();
+  const [CMPosition, setCMPosition] = createSignal({ x: 0, y: 0 });
 
-  let contextMenu: any;
-  let root: any;
-
-  onMount(() => {
-    root.addEventListener('contextmenu', handleContextMenu);
-    root.addEventListener('click', handleMouseClick);
-  })
+  let table: HTMLDivElement | undefined;
 
   onCleanup(() => {
-    root.removeEventListener('contextmenu', handleContextMenu);
-    root.removeEventListener('click', handleMouseClick);
-  })
+    window.removeEventListener('contextmenu', unselectForContextMenu);
+    window.removeEventListener('click', unselectForClick);
+  });
+
+  // Files
+  // setSelectedFile to not selected when files change
+  createEffect(() => {
+    if (files()) {
+      setSelFile(NOT_SELECTED);
+    }
+  });
 
   createEffect(() => {
     if (ctx.isLogged() == false) {
@@ -28,23 +38,19 @@ function RemoteExplorer() {
     }
   });
 
-  function handleContextMenu(e: MouseEvent) {
-    e.preventDefault();
-    var pe = document.elementsFromPoint(e.clientX, e.clientY);
-    if (matchesClassNames(pe, ['cell'])) {
-      const attrVal = pe[0].getAttribute('data-idx');
-      if (attrVal !== null) {
-        closeContextMenu();
-        openContextMenuForRow(Number(attrVal), e);
+  function onRowClick(i: number) {
+    return function(e: MouseEvent) {
+      setCMPosition(() => {
+        return {
+          x: e.clientX,
+          y: e.clientY
+        };
+      })
+      if (selFile() == NOT_SELECTED) {
+        window.addEventListener('contextmenu', unselectForContextMenu);
+        window.addEventListener('click', unselectForClick);
       }
-    }
-  }
-
-  function handleMouseClick(e: MouseEvent) {
-    var pe = document.elementsFromPoint(e.clientX, e.clientY);
-
-    if (!matchesClassNames(pe, ['contextmenu', 'element'])) {
-      closeContextMenu();
+      setSelFile(i);
     }
   }
 
@@ -52,58 +58,56 @@ function RemoteExplorer() {
     changeFiles(await ctx.ls(10, query()));
   }
 
-  function openContextMenuForRow(i: number, e: MouseEvent) {
-    setCMVisible(true);
-    const file = files()[i];
-    const x = e.clientX;
-    const y = e.clientY;
-    contextMenu.style.left = `${x}px`;
-    contextMenu.style.top = `${y}px`;
+  // Context Menu
+  createEffect(() => {
+    if (selFile() == NOT_SELECTED) {
+      window.removeEventListener('contextmenu', unselectForContextMenu);
+      window.removeEventListener('click', unselectForClick);
+    }
+    log('selected file =', selFile());
+  });
+
+  function unselectForClick(ev: MouseEvent) {
+    const x = ev.clientX;
+    const y = ev.clientY;
+    const elementsUnder = document.elementsFromPoint(x, y);
+    for (const elem of elementsUnder) {
+      if (elem == contextMenu()) {
+        return;
+      }
+    }
+    setSelFile(NOT_SELECTED);
   }
 
-  function closeContextMenu() {
-    setCMVisible(false);
-  }
-
-  function hello() {
-    setCMVisible(false);
+  function unselectForContextMenu(ev: MouseEvent) {
+    ev.preventDefault();
+    const x = ev.clientX;
+    const y = ev.clientY;
+    const elementsUnder = document.elementsFromPoint(x, y);
+    for (const elem of elementsUnder) {
+      if (elem == table || elem == contextMenu()) {
+        return;
+      }
+    }
+    setSelFile(NOT_SELECTED);
   }
 
   return (
-    <>
-      <div ref={root} class='remotefile'>
-        <button onClick={handleListClick}>List remote files</button>
-        <div class='table'>
-          <For each={files()}>{(file, i) =>
-            <tr class='row'>
-              <td class='cell' data-idx={i()}>{file.getName()}</td>
-              <td class='cell' data-idx={i()}>{file.getSize()}</td>
-              <td class='cell' data-idx={i()}>{file.getCreatedTime().toLocaleString()}</td>
-              <td class='cell' data-idx={i()}>{file.getMimeType().toLocaleString()}</td>
-            </tr>
-          }</For>
-        </div>
-        <div ref={contextMenu} class='contextmenu' style={{ visibility: CMVisible() ? 'visible' : 'hidden' }}>
-          <div onClick={hello} class='element'>
-            <span>Upload</span>
-          </div>
-          <div onClick={hello} class='element'>
-            <span>Download</span>
-          </div>
-          <div onClick={hello} class='element'>
-            <span>Remove</span>
-          </div>
-          <div onClick={hello} class='element'>
-            <span>Encrypt</span>
-          </div>
-          <div onClick={hello} class='element'>
-            <span>Decrypt</span>
-          </div>
-        </div>
+    <div class='remotefile'>
+      <button onClick={handleListClick}>List remote files</button>
+      <div ref={table} class='table'>
+        <For each={files()}>{(file, i) =>
+          <tr onContextMenu={onRowClick(i())} class='row'>
+            <td class='cell'>{file.getName()}</td>
+            <td class='cell'>{file.getSize()}</td>
+            <td class='cell'>{file.getCreatedTime().toLocaleString()}</td>
+            <td class='cell'>{file.getMimeType().toLocaleString()}</td>
+          </tr>
+        }</For>
       </div>
-    </>
-  )
-
+      <RemoteContextMenu setRef={setContextMenu} selFile={selFile()} CMPosition={CMPosition()} />
+    </div>
+  );
 }
 
 export default RemoteExplorer

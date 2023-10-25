@@ -19,26 +19,19 @@ function LocalExplorer() {
   let inputFile: HTMLInputElement | undefined;
   let table: HTMLDivElement | undefined;
 
+  onCleanup(() => {
+    // Context Menu
+    window.removeEventListener('contextmenu', unselectForContextMenu);
+    window.removeEventListener('click', unselectForClick);
+  })
+
+  // Files
   // setSelectedFile to not selected when files change
   createEffect(() => {
     if (files()) {
       setSelFile(NOT_SELECTED);
     }
   });
-
-  createEffect(() => {
-    if (selFile() == NOT_SELECTED) {
-      window.removeEventListener('contextmenu', unselectForContextMenu);
-      window.removeEventListener('click', unselectForClick);
-    }
-    log('selected file =', selFile());
-  })
-
-  onCleanup(() => {
-    window.removeEventListener('contextmenu', unselectForContextMenu);
-    window.removeEventListener('click', unselectForClick);
-  })
-
 
   async function inputFileOnChange(event: any) {
     const fileList: FileList = event.target.files;
@@ -65,6 +58,15 @@ function LocalExplorer() {
       setSelFile(i);
     }
   }
+
+  // Context Menu 
+  createEffect(() => {
+    if (selFile() == NOT_SELECTED) {
+      window.removeEventListener('contextmenu', unselectForContextMenu);
+      window.removeEventListener('click', unselectForClick);
+    }
+    log('selected file =', selFile());
+  })
 
   function unselectForClick(ev: MouseEvent) {
     const x = ev.clientX;
