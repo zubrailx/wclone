@@ -5,6 +5,10 @@ import LocalContextMenu from "./LocalContextMenu.jsx";
 
 const NOT_SELECTED = -1;
 
+function log(...msg: any) {
+  return console.log('[LocalExplorer]:', ...msg)
+}
+
 function LocalExplorer() {
   const [files, setFiles] = createSignal<LocalFile[]>([], { equals: false });
   const [selFile, setSelFile] = createSignal(NOT_SELECTED);
@@ -25,7 +29,7 @@ function LocalExplorer() {
       window.removeEventListener('contextmenu', unselectIfClickedOutsidePrevent);
       window.removeEventListener('click', unselectIfClickedOutside);
     }
-    console.log('selected file: ', selFile());
+    log('selected file =', selFile());
   })
 
   onCleanup(() => {
