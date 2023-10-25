@@ -28,15 +28,15 @@ function LocalExplorer() {
 
   createEffect(() => {
     if (selFile() == NOT_SELECTED) {
-      window.removeEventListener('contextmenu', unselectIfClickedOutsidePrevent);
-      window.removeEventListener('click', unselectIfClickedOutside);
+      window.removeEventListener('contextmenu', unselectForContextMenu);
+      window.removeEventListener('click', unselectForClick);
     }
     log('selected file =', selFile());
   })
 
   onCleanup(() => {
-    window.removeEventListener('contextmenu', unselectIfClickedOutsidePrevent);
-    window.removeEventListener('click', unselectIfClickedOutside);
+    window.removeEventListener('contextmenu', unselectForContextMenu);
+    window.removeEventListener('click', unselectForClick);
   })
 
 
@@ -59,29 +59,36 @@ function LocalExplorer() {
         };
       })
       if (selFile() == NOT_SELECTED) {
-        window.addEventListener('contextmenu', unselectIfClickedOutsidePrevent);
-        window.addEventListener('click', unselectIfClickedOutside);
+        window.addEventListener('contextmenu', unselectForContextMenu);
+        window.addEventListener('click', unselectForClick);
       }
       setSelFile(i);
     }
   }
 
-  function unselectIfClickedOutside(ev: MouseEvent) {
+  function unselectForClick(ev: MouseEvent) {
     const x = ev.clientX;
     const y = ev.clientY;
     const elementsUnder = document.elementsFromPoint(x, y);
-    console.log(contextMenu());
     for (const elem of elementsUnder) {
-      if (elem == table || elem == contextMenu()) {
+      if (elem == contextMenu()) {
         return;
       }
     }
     setSelFile(NOT_SELECTED);
   }
 
-  function unselectIfClickedOutsidePrevent(ev: MouseEvent) {
+  function unselectForContextMenu(ev: MouseEvent) {
     ev.preventDefault();
-    unselectIfClickedOutside(ev);
+    const x = ev.clientX;
+    const y = ev.clientY;
+    const elementsUnder = document.elementsFromPoint(x, y);
+    for (const elem of elementsUnder) {
+      if (elem == table || elem == contextMenu()) {
+        return;
+      }
+    }
+    setSelFile(NOT_SELECTED);
   }
 
   return (
