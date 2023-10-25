@@ -1,4 +1,4 @@
-import { Setter, createEffect, onMount } from "solid-js";
+import { Setter, createEffect, onCleanup, onMount } from "solid-js";
 
 const FILE_NOT_SELECTED = -1;
 
@@ -29,6 +29,13 @@ function Explorer(props: Props) {
     props.setFunctions({
       onRowClick: onRowClick
     })
+  })
+
+  // WARN: may remove wrong EventListener
+  onCleanup(() => {
+    // Context Menu
+    window.removeEventListener('contextmenu', unselectForContextMenu);
+    window.removeEventListener('click', unselectForClick);
   })
 
   // Files
