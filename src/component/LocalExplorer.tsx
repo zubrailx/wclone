@@ -1,7 +1,8 @@
 import { createEffect, createSignal, onCleanup } from "solid-js";
 import { For } from "solid-js";
-import { LocalFile, fromFile } from "../file.js";
+import { EncryptedLocalFile, fromFile } from "../file.js";
 import LocalContextMenu from "./LocalContextMenu.jsx";
+import { Algorithm } from "../cypher/base.js";
 
 const NOT_SELECTED = -1;
 
@@ -10,9 +11,10 @@ function log(...msg: any) {
 }
 
 function LocalExplorer() {
-  const [files, setFiles] = createSignal<LocalFile[]>([], { equals: false });
+  const [files, setFiles] = createSignal<EncryptedLocalFile[]>([], { equals: false });
   const [selFile, setSelFile] = createSignal(NOT_SELECTED);
   const [CMPosition, setCMPosition] = createSignal({ x: 0, y: 0 });
+  const [contextMenu, setContextMenu] = createSignal();
 
   let inputFile: HTMLInputElement | undefined;
   let table: HTMLDivElement | undefined;
@@ -41,9 +43,9 @@ function LocalExplorer() {
   async function inputFileOnChange(event: any) {
     const fileList: FileList = event.target.files;
     for (const file of fileList) {
-      const localFile = await fromFile(file);
+      const newFile = new EncryptedLocalFile(await fromFile(file), Algorithm.NONE);
       setFiles((files) => {
-        return [...files, localFile]
+        return [...files, newFile]
       });
     }
   }
@@ -68,8 +70,9 @@ function LocalExplorer() {
     const x = ev.clientX;
     const y = ev.clientY;
     const elementsUnder = document.elementsFromPoint(x, y);
+    console.log(contextMenu());
     for (const elem of elementsUnder) {
-      if (elem == table) {
+      if (elem == table || elem == contextMenu()) {
         return;
       }
     }
@@ -90,12 +93,12 @@ function LocalExplorer() {
             <tr onContextMenu={onRowClick(i())} class='row'>
               <td class='cell'>{file.getName()}</td>
               <td class='cell'>{file.getSize()}</td>
-              <td class='cell'>{file.getCreatedTime().toLocaleString()}</td>
+              <td class='cell'>{file.getModifiedTime().toLocaleString()}</td>
               <td class='cell'>{file.getMimeType().toLocaleString()}</td>
             </tr>
           }</For>
         </div>
-        <LocalContextMenu files={files()} setFiles={setFiles} selFile={selFile()} CMPosition={CMPosition()} />
+        <LocalContextMenu setRef={setContextMenu} files={files()} setFiles={setFiles} selFile={selFile()} CMPosition={CMPosition()} />
       </div>
     </>
   )
