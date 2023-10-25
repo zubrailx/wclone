@@ -92,22 +92,20 @@ function LocalExplorer() {
   }
 
   return (
-    <>
-      <div class='localfile'>
-        <input type="file" ref={inputFile} onChange={inputFileOnChange} value="Upload" multiple />
-        <div ref={table} class='table'>
-          <For each={files()}>{(file, i) =>
-            <tr onContextMenu={onRowClick(i())} class='row'>
-              <td class='cell'>{file.getName()}</td>
-              <td class='cell'>{file.getSize()}</td>
-              <td class='cell'>{file.getModifiedTime().toLocaleString()}</td>
-              <td class='cell'>{file.getMimeType().toLocaleString()}</td>
-            </tr>
-          }</For>
-        </div>
-        <LocalContextMenu setRef={setContextMenu} files={files()} setFiles={setFiles} selFile={selFile()} CMPosition={CMPosition()} />
+    <div class='localfile'>
+      <input type="file" ref={inputFile} onChange={inputFileOnChange} value="Upload" multiple />
+      <div ref={table} class='table'>
+        <For each={files()}>{(file, i) =>
+          <tr onContextMenu={onRowClick(i())} class='row'>
+            <td class='cell'>{file.getName()}</td>
+            <td class='cell'>{file.getSize()}</td>
+            <td class='cell'>{file.getModifiedTime().toLocaleString()}</td>
+            <td class='cell'>{file.getMimeType().toLocaleString()}</td>
+          </tr>
+        }</For>
       </div>
-    </>
+      <LocalContextMenu setRef={setContextMenu} files={files()} setFiles={setFiles} selFile={selFile()} CMPosition={CMPosition()} />
+    </div>
   )
 }
 
