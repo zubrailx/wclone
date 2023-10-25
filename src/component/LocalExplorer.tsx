@@ -1,53 +1,38 @@
-import { createSignal, onCleanup, onMount } from "solid-js";
+import { createEffect, createSignal, onCleanup } from "solid-js";
 import { For } from "solid-js";
 import { LocalFile, fromFile } from "../file.js";
-import { matchesClassNames } from "../utils.js";
+import LocalContextMenu from "./LocalContextMenu.jsx";
 
-const ATTR_FILE_IDX = 'data-idx';
+const NOT_SELECTED = -1;
 
 function LocalExplorer() {
-  const [files, setFiles] = createSignal<LocalFile[]>([], {equals: false});
-  const [CMVisible, setCMVisible] = createSignal(false);
+  const [files, setFiles] = createSignal<LocalFile[]>([], { equals: false });
+  const [selFile, setSelFile] = createSignal(NOT_SELECTED);
+  const [CMPosition, setCMPosition] = createSignal({ x: 0, y: 0 });
 
   let inputFile: HTMLInputElement | undefined;
-  let divRows: HTMLDivElement | undefined;
-  let contextMenu: HTMLDivElement | undefined;
-  let root: HTMLDivElement | undefined;
+  let table: HTMLDivElement | undefined;
 
-  onMount(() => {
-    root!.addEventListener('contextmenu', handleContextMenu);
-    root!.addEventListener('click', handleMouseClick);
+  // setSelectedFile to not selected when files change
+  createEffect(() => {
+    if (files()) {
+      setSelFile(NOT_SELECTED);
+    }
+  });
+
+  createEffect(() => {
+    if (selFile() == NOT_SELECTED) {
+      window.removeEventListener('contextmenu', unselectIfClickedOutsidePrevent);
+      window.removeEventListener('click', unselectIfClickedOutside);
+    }
+    console.log('selected file: ', selFile());
   })
 
   onCleanup(() => {
-    root!.removeEventListener('contextmenu', handleContextMenu);
-    root!.removeEventListener('click', handleMouseClick);
+    window.removeEventListener('contextmenu', unselectIfClickedOutsidePrevent);
+    window.removeEventListener('click', unselectIfClickedOutside);
   })
 
-  function handleContextMenu(e: MouseEvent) {
-    e.preventDefault();
-    const elements = document.elementsFromPoint(e.clientX, e.clientY);
-    if (matchesClassNames(elements, ['localfile', 'cell'])) {
-      const rowElem = (elements[0].parentNode! as HTMLElement);
-      if (rowElem === null) {
-        return;
-      }
-      const attrDataIdx = rowElem.getAttribute(ATTR_FILE_IDX)
-      if (attrDataIdx === null) {
-        return;
-      }
-      closeContextMenu();
-      openContextMenuForRow(Number(attrDataIdx), e);
-    }
-  }
-
-  function handleMouseClick(e: MouseEvent) {
-    const pe = document.elementsFromPoint(e.clientX, e.clientY);
-
-    if (!matchesClassNames(pe, ['contextmenu', 'element'])) {
-      closeContextMenu();
-    }
-  }
 
   async function inputFileOnChange(event: any) {
     const fileList: FileList = event.target.files;
@@ -59,56 +44,46 @@ function LocalExplorer() {
     }
   }
 
-  function downloadFileOnClick() {
-    const localFile = getLocalFileFromContextMenu();
-    const downloadLink = document.createElement("a");
-    downloadLink.href = URL.createObjectURL(localFile.toFile());
-    downloadLink.setAttribute('download', '');
-    downloadLink.style.visibility = 'none';
-    downloadLink.style.position = 'absolute';
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
-    closeContextMenu();
+  function onRowClick(i: number) {
+    return function(e: MouseEvent) {
+      setCMPosition(() => {
+        return {
+          x: e.clientX,
+          y: e.clientY
+        };
+      })
+      if (selFile() == NOT_SELECTED) {
+        window.addEventListener('contextmenu', unselectIfClickedOutsidePrevent);
+        window.addEventListener('click', unselectIfClickedOutside);
+      }
+      setSelFile(i);
+    }
   }
 
-  function removeFileOnClick() {
-    const idx = getFileIdxFromContextMenu();
-    setFiles((files) => { 
-      files.splice(idx, 1); 
-      return files 
-    });
-    closeContextMenu();
+  function unselectIfClickedOutside(ev: MouseEvent) {
+    const x = ev.clientX;
+    const y = ev.clientY;
+    const elementsUnder = document.elementsFromPoint(x, y);
+    for (const elem of elementsUnder) {
+      if (elem == table) {
+        return;
+      }
+    }
+    setSelFile(NOT_SELECTED);
   }
 
-  function getFileIdxFromContextMenu() {
-    return Number(contextMenu!.getAttribute(ATTR_FILE_IDX));
-  }
-
-  function getLocalFileFromContextMenu() {
-    return files()[getFileIdxFromContextMenu()];
-  }
-
-  function openContextMenuForRow(attrDataIdx: number, e: MouseEvent) {
-    setCMVisible(true);
-    const x = e.clientX;
-    const y = e.clientY;
-    contextMenu!.style.left = `${x}px`;
-    contextMenu!.style.top = `${y}px`;
-    contextMenu!.setAttribute('data-idx', String(attrDataIdx));
-  }
-
-  function closeContextMenu() {
-    setCMVisible(false);
+  function unselectIfClickedOutsidePrevent(ev: MouseEvent) {
+    ev.preventDefault();
+    unselectIfClickedOutside(ev);
   }
 
   return (
     <>
-      <div ref={root} class='localfile'>
+      <div class='localfile'>
         <input type="file" ref={inputFile} onChange={inputFileOnChange} value="Upload" multiple />
-        <div ref={divRows} class='table'>
+        <div ref={table} class='table'>
           <For each={files()}>{(file, i) =>
-            <tr class='row' data-idx={i()}>
+            <tr onContextMenu={onRowClick(i())} class='row'>
               <td class='cell'>{file.getName()}</td>
               <td class='cell'>{file.getSize()}</td>
               <td class='cell'>{file.getCreatedTime().toLocaleString()}</td>
@@ -116,23 +91,7 @@ function LocalExplorer() {
             </tr>
           }</For>
         </div>
-      </div>
-      <div ref={contextMenu} class='contextmenu' style={{ visibility: CMVisible() ? 'visible' : 'hidden' }}>
-        <div class='element'>
-          <span>Upload</span>
-        </div>
-        <div onClick={downloadFileOnClick} class='element'>
-          <span>Download</span>
-        </div>
-        <div onClick={removeFileOnClick} class='element'>
-          <span>Remove</span>
-        </div>
-        <div class='element'>
-          <span>Encrypt</span>
-        </div>
-        <div class='element'>
-          <span>Decrypt</span>
-        </div>
+        <LocalContextMenu files={files()} setFiles={setFiles} selFile={selFile()} CMPosition={CMPosition()} />
       </div>
     </>
   )
