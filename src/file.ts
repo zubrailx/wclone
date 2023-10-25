@@ -1,15 +1,17 @@
+import { readStreamChunks } from "./utils.js";
+
 export class LocalFile {
   name: string;
   mimeType: string;
   size: number;
-  createdTime: Date;
-  content: string;
+  lastModified: Date;
+  content: Uint8Array[];
 
-  constructor(name: string, size: number, mimeType: string, createdTime: Date, content: string) {
+  constructor(name: string, size: number, mimeType: string, lastModified: Date, content: Uint8Array[]) {
     this.name = name;
     this.size = size;
     this.mimeType = mimeType;
-    this.createdTime = createdTime;
+    this.lastModified = lastModified;
     this.content = content;
   }
 
@@ -26,7 +28,15 @@ export class LocalFile {
   }
 
   getCreatedTime() {
-    return this.createdTime;
+    return this.lastModified;
+  }
+
+  toFile(): File {
+    return new File(this.content, this.getName(), { type: this.mimeType, lastModified: this.lastModified.getTime() });
   }
 };
 
+export async function fromFile(file: File): Promise<LocalFile> {
+  const content = await readStreamChunks(file.stream());
+  return new LocalFile(file.name, file.size, file.type, new Date(file.lastModified), content);
+}

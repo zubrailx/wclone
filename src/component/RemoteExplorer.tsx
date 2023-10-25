@@ -72,7 +72,7 @@ function RemoteExplorer() {
   return (
     <>
       <div ref={root} class='remotefile'>
-        <button onClick={handleListClick}>List files</button>
+        <button onClick={handleListClick}>List remote files</button>
         <div class='table'>
           <For each={files()}>{(file, i) =>
             <tr class='row'>
