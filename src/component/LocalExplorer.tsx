@@ -1,9 +1,10 @@
-import { createSignal } from "solid-js";
+import { createEffect, createSignal } from "solid-js";
 import { For } from "solid-js";
 import { EncryptedLocalFile, fromFile } from "../file.js";
 import LocalContextMenu from "./LocalContextMenu.jsx";
 import { Algorithm } from "../cypher/base.js";
 import Explorer, { ExplorerFunctions, FILE_NOT_SELECTED } from "./Explorer.jsx";
+import { Table, TableCell, TableHeadCell, TableHeadRow, TableRow } from "./Table.jsx";
 
 function log(...msg: any) {
   return console.log('[LocalExplorer]:', ...msg)
@@ -17,6 +18,7 @@ function LocalExplorer() {
   const [explorerFunctions, setExplorerFunctions] = createSignal<ExplorerFunctions>({
     onRowClick: Function,
   });
+  const [headerVisible, setHeaderVisible] = createSignal<boolean>(false);
 
   let inputFile: HTMLInputElement | undefined;
   let table: HTMLDivElement | undefined;
@@ -35,24 +37,31 @@ function LocalExplorer() {
   return (
     <Explorer setCMPosition={setCMPosition} files={files()} selFile={selFile()}
       setSelFile={setSelFile} contextMenu={contextMenu()} table={table}
-      setFunctions={setExplorerFunctions} log={log}>
+      setFunctions={setExplorerFunctions} setHeaderVisible={setHeaderVisible} log={log}>
 
       <div class='localfile'>
         <input type="file" ref={inputFile} onChange={inputFileOnChange} value="Upload" multiple />
-        <div ref={table} class='table'>
+        <Table ref={table}>
+          <TableHeadRow visible={headerVisible()}>
+            <TableHeadCell>Algorithm</TableHeadCell>
+            <TableHeadCell>Name</TableHeadCell>
+            <TableHeadCell>Size</TableHeadCell>
+            <TableHeadCell>Modified Time</TableHeadCell>
+            <TableHeadCell>Mime Type</TableHeadCell>
+          </TableHeadRow>
           <For each={files()}>{(file, i) =>
-            <tr onContextMenu={explorerFunctions().onRowClick(i())} class='row'>
-              <td class='cell'>{file.getName()}</td>
-              <td class='cell'>{file.getSize()}</td>
-              <td class='cell'>{file.getModifiedTime().toLocaleString()}</td>
-              <td class='cell'>{file.getMimeType().toLocaleString()}</td>
-            </tr>
+            <TableRow onContextMenu={explorerFunctions().onRowClick(i())}>
+              <TableCell>{Algorithm[file.getEncryptAlgorithm()]}</TableCell>
+              <TableCell>{file.getName()}</TableCell>
+              <TableCell>{file.getSize()}</TableCell>
+              <TableCell>{file.getModifiedTime().toLocaleString()}</TableCell>
+              <TableCell>{file.getMimeType().toLocaleString()}</TableCell>
+            </TableRow>
           }</For>
-        </div>
+        </Table>
         <LocalContextMenu files={files()} setFiles={setFiles} selFile={selFile()}
           CMPosition={CMPosition()} setRef={setContextMenu} Ref={contextMenu()} />
       </div>
-
     </Explorer>
   )
 }

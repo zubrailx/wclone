@@ -18,12 +18,14 @@ type Props = {
   setSelFile: Setter<number>,
   contextMenu: unknown,
   table: unknown,
+  setHeaderVisible: Setter<boolean>,
   setFunctions: Setter<ExplorerFunctions>,
   log: Function,
   children?: any
 };
 
 
+// Explorer handler
 function Explorer(props: Props) {
 
   onMount(() => {
@@ -44,6 +46,11 @@ function Explorer(props: Props) {
       props.setSelFile(FILE_NOT_SELECTED);
     }
   });
+
+  createEffect(() => {
+    props.setHeaderVisible(props.files.length > 0)
+  })
+
 
   function onRowClick(i: number) {
     return function(e: MouseEvent) {

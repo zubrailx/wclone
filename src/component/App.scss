@@ -8,15 +8,19 @@
 
 .table {
   .row {
+    display: table-row;
     cursor: context-menu;
     .cell {
+      display: table-cell;
       border-style: solid;
       border-width: 1px 0px 0px 1px;
     }
     .cell:last-child {
       border-width: 1px 1px 0px 1px;
     }
-
+    .head {
+      font-weight: 600;
+    }
   }
   .row:last-child {
     .cell {
