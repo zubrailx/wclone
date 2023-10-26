@@ -35,11 +35,10 @@ function RemoteExplorer() {
   }
 
   return (
-    <>
-      <Explorer setCMPosition={setCMPosition} files={files()} selFile={selFile()}
-        setSelFile={setSelFile} contextMenu={contextMenu()} table={table}
-        setFunctions={setExplorerFunctions} log={log}
-      />
+    <Explorer setCMPosition={setCMPosition} files={files()} selFile={selFile()}
+      setSelFile={setSelFile} contextMenu={contextMenu()} table={table}
+      setFunctions={setExplorerFunctions} log={log}>
+
       <div class='remotefile'>
         <button onClick={handleListClick}>List remote files</button>
         <div ref={table} class='table'>
@@ -54,7 +53,8 @@ function RemoteExplorer() {
         </div>
         <RemoteContextMenu setRef={setContextMenu} selFile={selFile()} CMPosition={CMPosition()} />
       </div>
-    </>
+
+    </Explorer>
   );
 }
 

@@ -19,7 +19,8 @@ type Props = {
   contextMenu: unknown,
   table: unknown,
   setFunctions: Setter<ExplorerFunctions>,
-  log: Function
+  log: Function,
+  children?: any
 };
 
 
@@ -31,7 +32,6 @@ function Explorer(props: Props) {
     })
   })
 
-  // WARN: may remove wrong EventListener
   onCleanup(() => {
     // Context Menu
     window.removeEventListener('contextmenu', unselectForContextMenu);
@@ -95,7 +95,7 @@ function Explorer(props: Props) {
     props.setSelFile(FILE_NOT_SELECTED);
   }
 
-  return (<></>)
+  return (<>{...props.children}</>)
 }
 
 export default Explorer

@@ -35,11 +35,10 @@ function LocalExplorer() {
   }
 
   return (
-    <>
-      <Explorer setCMPosition={setCMPosition} files={files()} selFile={selFile()}
-        setSelFile={setSelFile} contextMenu={contextMenu()} table={table}
-        setFunctions={setExplorerFunctions} log={log}
-      />
+    <Explorer setCMPosition={setCMPosition} files={files()} selFile={selFile()}
+      setSelFile={setSelFile} contextMenu={contextMenu()} table={table}
+      setFunctions={setExplorerFunctions} log={log}>
+
       <div class='localfile'>
         <input type="file" ref={inputFile} onChange={inputFileOnChange} value="Upload" multiple />
         <div ref={table} class='table'>
@@ -54,7 +53,8 @@ function LocalExplorer() {
         </div>
         <LocalContextMenu setRef={setContextMenu} files={files()} setFiles={setFiles} selFile={selFile()} CMPosition={CMPosition()} />
       </div>
-    </>
+
+    </Explorer>
   )
 }
 
