@@ -1,7 +1,7 @@
 import { For, createEffect, createSignal } from "solid-js";
 import { DriveFileMeta } from "../drive/base.js";
 import { useDriveAPI } from "./DriveProvider.jsx";
-import RemoteContextMenu from "./RemoteContextMenu.jsx";
+import RemoteContextMenu, { RFileCap } from "./RemoteContextMenu.jsx";
 import Explorer, { ExplorerFunctions, FILE_NOT_SELECTED } from "./Explorer.jsx";
 import { Table, TableCell, TableHeadCell, TableHeadRow, TableRow } from "./Table.jsx";
 
@@ -25,6 +25,8 @@ function RemoteExplorer() {
     onRowClick: Function,
   });
   const [headerVisible, setHeaderVisible] = createSignal<boolean>(false);
+
+  const [capabilities, setCapabilities] = createSignal<RFileCap[]>([]);
 
   let table: HTMLDivElement | undefined;
 
@@ -70,7 +72,7 @@ function RemoteExplorer() {
           }</For>
         </Table>
         <RemoteContextMenu fn={fn} position={CMPosition()} visible={CMVisible()}
-          setRef={setContextMenu} Ref={contextMenu()} />
+          setRef={setContextMenu} Ref={contextMenu()} capabilities={capabilities()} />
       </div>
     </Explorer>
   );

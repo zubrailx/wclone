@@ -1,7 +1,7 @@
 import { createEffect, createSignal } from "solid-js";
 import { For } from "solid-js";
 import { EncryptableLocalFile, fromFile } from "../localfile.js";
-import LocalContextMenu from "./LocalContextMenu.jsx";
+import LocalContextMenu, { LFileCap } from "./LocalContextMenu.jsx";
 import { Algorithm } from "../cypher/base.js";
 import Explorer, { ExplorerFunctions, FILE_NOT_SELECTED } from "./Explorer.jsx";
 import { Table, TableCell, TableHeadCell, TableHeadRow, TableRow } from "./Table.jsx";
@@ -23,6 +23,10 @@ function LocalExplorer() {
     onRowClick: Function,
   });
   const [headerVisible, setHeaderVisible] = createSignal<boolean>(false);
+
+  const [capabilities, setCapabilities] = createSignal<LFileCap[]>([
+    LFileCap.DECRYPT, LFileCap.ENCRYPT, LFileCap.REMOVE, LFileCap.DOWNLOAD, LFileCap.UPLOAD
+  ]);
 
   let inputFile: HTMLInputElement | undefined;
   let table: HTMLDivElement | undefined;
@@ -119,7 +123,7 @@ function LocalExplorer() {
           }</For>
         </Table>
         <LocalContextMenu fn={fn} visible={CMVisible()} position={CMPosition()}
-          Ref={contextMenu()} setRef={setContextMenu} />
+          Ref={contextMenu()} setRef={setContextMenu} capabilities={capabilities()} />
       </div>
     </Explorer>
   )
