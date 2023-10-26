@@ -12,15 +12,22 @@ type ExplorerFunctions = {
 }
 
 type Props = {
-  setCMPosition: Setter<Position>,
   files: any[],
   selFile: number,
   setSelFile: Setter<number>,
-  contextMenu: unknown,
+
   table: unknown,
   setHeaderVisible: Setter<boolean>,
-  setFunctions: Setter<ExplorerFunctions>,
+  tableFunctions: Setter<ExplorerFunctions>,
+
+  CMVisible: boolean,
+  setCMVisible: Setter<boolean>,
+  CMPosition: Position,
+  setCMPosition: Setter<Position>,
+  contextMenu: any,
+
   log: Function,
+
   children?: any
 };
 
@@ -29,7 +36,7 @@ type Props = {
 function Explorer(props: Props) {
 
   onMount(() => {
-    props.setFunctions({
+    props.tableFunctions({
       onRowClick: onRowClick
     })
   })
@@ -51,15 +58,10 @@ function Explorer(props: Props) {
     props.setHeaderVisible(props.files.length > 0)
   })
 
-
+  // Context Menu
   function onRowClick(i: number) {
     return function(e: MouseEvent) {
-      props.setCMPosition(() => {
-        return {
-          x: e.clientX,
-          y: e.clientY
-        };
-      })
+      props.setCMPosition({ x: e.clientX, y: e.clientY });
       if (props.selFile == FILE_NOT_SELECTED) {
         window.addEventListener('contextmenu', unselectForContextMenu);
         window.addEventListener('click', unselectForClick);
@@ -68,7 +70,6 @@ function Explorer(props: Props) {
     }
   }
 
-  // Context Menu
   createEffect(() => {
     if (props.selFile == FILE_NOT_SELECTED) {
       window.removeEventListener('contextmenu', unselectForContextMenu);
@@ -101,6 +102,14 @@ function Explorer(props: Props) {
     }
     props.setSelFile(FILE_NOT_SELECTED);
   }
+
+  createEffect(() => {
+    if (props.selFile == FILE_NOT_SELECTED) {
+      props.setCMVisible(false);
+    } else {
+      props.setCMVisible(true);
+    }
+  })
 
   return (<>{...props.children}</>)
 }

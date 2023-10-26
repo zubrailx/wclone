@@ -1,4 +1,4 @@
-import { EncryptableLocalFile, LocalFile } from "../file.js";
+import { EncryptableLocalFile, LocalFile } from "../localfile.js";
 
 export enum Algorithm {
   NONE = 0,

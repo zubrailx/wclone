@@ -1,22 +1,10 @@
-import { Setter, createEffect } from "solid-js";
-import { FILE_NOT_SELECTED } from "./Explorer.jsx";
+import { createEffect } from "solid-js";
 
-type Props = { selFile: number, CMPosition: any, setCMVisible: Setter<boolean>, CMVisible: boolean, root: any, children?: any };
-
-// ContextMenu handler
-function ContextMenu(props: Props) {
+function ContextMenu(props: { position: any, visible: boolean, root: any, children?: any }) {
 
   createEffect(() => {
-    if (props.selFile == FILE_NOT_SELECTED) {
-      props.setCMVisible(false);
-    } else {
-      props.setCMVisible(true);
-    }
-  })
-
-  createEffect(() => {
-    if (props.CMVisible) {
-      setContextMenuPosition(props.CMPosition.x, props.CMPosition.y);
+    if (props.visible) {
+      setContextMenuPosition(props.position.x, props.position.y);
     }
   })
 

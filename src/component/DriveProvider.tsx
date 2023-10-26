@@ -1,20 +1,25 @@
 import { createContext, useContext } from "solid-js";
 import { SetStoreFunction, createStore } from "solid-js/store";
-import { DriveCtx } from "../backend/base.js";
+import { DriveAPI } from "../drive/base.js";
 
 const DriveContext = createContext();
 
-export function DriveProvider(props: any) {
-  const [dCtx, setDCtx] = createStore(props.ctx);
-  const driveCtx = [ dCtx, setDCtx ]
+type Props = {
+  api: any,
+  children?: any
+}
+
+export function DriveProvider(props: Props) {
+  const [api, setApi] = createStore(props.api);
+  const driveApi = [ api, setApi ]
   
   return (
-    <DriveContext.Provider value={driveCtx} >
-      {props.children}
+    <DriveContext.Provider value={driveApi} >
+      {...props.children}
     </DriveContext.Provider>
   )
 }
 
-export function useDriveCtx(): [DriveCtx, SetStoreFunction<DriveCtx>] {
-  return useContext(DriveContext) as [DriveCtx, SetStoreFunction<DriveCtx>];
+export function useDriveAPI(): [DriveAPI, SetStoreFunction<DriveAPI>] {
+  return useContext(DriveContext) as [DriveAPI, SetStoreFunction<DriveAPI>];
 }

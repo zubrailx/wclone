@@ -1,13 +1,13 @@
 import { createSignal, onMount } from "solid-js";
-import { useDriveCtx } from "./DriveProvider.jsx";
+import { useDriveAPI } from "./DriveProvider.jsx";
 import { produce } from "solid-js/store";
 
 function BackendAuth() {
-  const [ctx, setCtx] = useDriveCtx()
+  const [api, setApi] = useDriveAPI()
 
   onMount(() => {
-    setCtx(produce(ctx => {
-      ctx.load();
+    setApi(produce(api => {
+      api.load();
     }));
   })
 
@@ -18,14 +18,14 @@ function BackendAuth() {
     let client_id = clientId.value;
     let api_key = apiKey.value;
 
-    setCtx(produce(ctx => {
-      ctx.init(client_id, api_key);
+    setApi(produce(api => {
+      api.init(client_id, api_key);
     }))
   }
 
   function signOut() {
-    setCtx(produce(ctx => {
-      ctx.revoke();
+    setApi(produce(api => {
+      api.revoke();
     }))
   }
 
@@ -40,8 +40,8 @@ function BackendAuth() {
           API Key:
           <input type="text" ref={apiKey} value="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" />
         </div>
-        <button onClick={signIn}>{ctx.isLogged() ? "Refresh" : "Sign in"}</button>
-        <button style={{ "visibility": ctx.isLogged() ? 'visible' : 'hidden' }} onClick={signOut}>Sign Out</button>
+        <button onClick={signIn}>{api.isLogged() ? "Refresh" : "Sign in"}</button>
+        <button style={{ "visibility": api.isLogged() ? 'visible' : 'hidden' }} onClick={signOut}>Sign Out</button>
       </div >
     </>
 

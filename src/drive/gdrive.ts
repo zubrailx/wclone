@@ -1,5 +1,5 @@
 import { loadScript } from "../utils.js";
-import { DriveFileInfo as DriveFileMeta, DriveCtx } from "./base.js";
+import { DriveFileMeta as DriveFileMeta, DriveAPI } from "./base.js";
 
 declare var gapi: any;
 declare var google: any;
@@ -39,7 +39,7 @@ class GDriveFileMeta implements DriveFileMeta {
 const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest';
 const SCOPES = 'https://www.googleapis.com/auth/drive';
 
-export class GDriveCtx implements DriveCtx {
+export class GDriveAPI implements DriveAPI {
   CLIENT_ID: String;
   API_KEY: String;
   tokenClient: any;
@@ -52,11 +52,11 @@ export class GDriveCtx implements DriveCtx {
 
   logged = false;
 
-  isLogged(): boolean {
+  public isLogged(): boolean {
     return this.logged;
   }
 
-  load(): void {
+  public load(): void {
     loadScript("https://apis.google.com/js/api.js", () => {
       this.gapiLoaded = true;
     });

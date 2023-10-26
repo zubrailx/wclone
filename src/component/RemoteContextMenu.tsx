@@ -1,12 +1,20 @@
-import { createEffect, createSignal, onMount } from "solid-js";
-import { FILE_NOT_SELECTED } from "./Explorer.jsx";
+import { onMount } from "solid-js";
+import { Position } from "./Explorer.jsx";
 import ContextMenu from "./ContextMenu.jsx";
 
-type Props = { CMPosition: any, selFile: number, setRef: any, Ref: any };
+type Props = {
+  fn: {
+    downloadFileOnClick: any,
+    removeFileOnClick: any,
+    changeDirectoryOnClick: any,
+  },
+  position: Position,
+  visible: boolean,
+  setRef: any,
+  Ref: any
+};
 
 function RemoteContextMenu(props: Props) {
-
-  const [CMVisible, setCMVisible] = createSignal(false);
 
   let root: any
 
@@ -14,23 +22,18 @@ function RemoteContextMenu(props: Props) {
     props.setRef(root);
   })
 
-  // create encrypt window
-  function downloadFileOnClick() {
-  }
-
-  function removeFileOnClick() {
-  }
-
   return (
-    <ContextMenu selFile={props.selFile} CMPosition={props.CMPosition}
-      setCMVisible={setCMVisible} CMVisible={CMVisible()} root={props.Ref}>
+    <ContextMenu position={props.position} visible={props.visible} root={props.Ref}>
 
-      <div ref={root} class='contextmenu' style={{ visibility: CMVisible() ? 'visible' : 'hidden' }}>
-        <div onClick={downloadFileOnClick} class='element'>
+      <div ref={root} class='contextmenu' style={{ visibility: props.visible ? 'visible' : 'hidden' }}>
+        <div onClick={props.fn.downloadFileOnClick} class='element'>
           <span>Download</span>
         </div>
-        <div onClick={removeFileOnClick} class='element'>
+        <div onClick={props.fn.removeFileOnClick} class='element'>
           <span>Remove</span>
+        </div>
+        <div onClick={props.fn.changeDirectoryOnClick} class='element'>
+          <span>Change Directory</span>
         </div>
       </div>
 
