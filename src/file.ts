@@ -32,7 +32,7 @@ export class LocalFile {
     return this.lastModified;
   }
 
-  getContent() {
+  getContent(): Uint8Array[] {
     return this.content;
   }
 
@@ -47,7 +47,7 @@ export async function fromFile(file: File): Promise<LocalFile> {
 }
 
 
-export class EncryptedLocalFile extends LocalFile {
+export class EncryptableLocalFile extends LocalFile {
   algorithm: Algorithm
 
   constructor(localfile: LocalFile, algorithm: Algorithm) {

@@ -1,3 +1,5 @@
+import CryptoJS from 'crypto-js';
+
 export function loadScript(src: string, onLoad: () => void) {
   let script = document.createElement('script');
   script.src = src;
@@ -54,4 +56,32 @@ export function base64ToBytes(base64: string): Uint8Array {
 export function bytesToBase64(bytes: Uint8Array): string {
   const binString = String.fromCodePoint(...bytes);
   return btoa(binString);
+}
+
+export function Uint8ArrayToCryptJsWordArray(u8Array: Uint8Array) {
+  return CryptoJS.lib.WordArray.create(u8Array as any);
+}
+
+export function CryptJsWordArrayToUint8Array(wordArray: CryptoJS.lib.WordArray): Uint8Array {
+  const l = wordArray.sigBytes;
+  const words = wordArray.words;
+  const result = new Uint8Array(l);
+  var i = 0 /*dst*/, j = 0 /*src*/;
+  while (true) {
+    // here i is a multiple of 4
+    if (i == l)
+      break;
+    var w = words[j++];
+    result[i++] = (w & 0xff000000) >>> 24;
+    if (i == l)
+      break;
+    result[i++] = (w & 0x00ff0000) >>> 16;
+    if (i == l)
+      break;
+    result[i++] = (w & 0x0000ff00) >>> 8;
+    if (i == l)
+      break;
+    result[i++] = (w & 0x000000ff);
+  }
+  return result;
 }

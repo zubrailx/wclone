@@ -1,6 +1,6 @@
 import { createEffect, createSignal } from "solid-js";
 import { For } from "solid-js";
-import { EncryptedLocalFile, fromFile } from "../file.js";
+import { EncryptableLocalFile, fromFile } from "../file.js";
 import LocalContextMenu from "./LocalContextMenu.jsx";
 import { Algorithm } from "../cypher/base.js";
 import Explorer, { ExplorerFunctions, FILE_NOT_SELECTED } from "./Explorer.jsx";
@@ -11,7 +11,7 @@ function log(...msg: any) {
 }
 
 function LocalExplorer() {
-  const [files, setFiles] = createSignal<EncryptedLocalFile[]>([], { equals: false });
+  const [files, setFiles] = createSignal<EncryptableLocalFile[]>([], { equals: false });
   const [selFile, setSelFile] = createSignal(FILE_NOT_SELECTED);
   const [CMPosition, setCMPosition] = createSignal({ x: 0, y: 0 });
   const [contextMenu, setContextMenu] = createSignal();
@@ -27,7 +27,7 @@ function LocalExplorer() {
   async function inputFileOnChange(event: any) {
     const fileList: FileList = event.target.files;
     for (const file of fileList) {
-      const newFile = new EncryptedLocalFile(await fromFile(file), Algorithm.NONE);
+      const newFile = new EncryptableLocalFile(await fromFile(file), Algorithm.NONE);
       setFiles((files) => {
         return [...files, newFile]
       });

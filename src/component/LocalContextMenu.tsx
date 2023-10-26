@@ -1,8 +1,10 @@
 import { Setter, createSignal, onMount } from "solid-js";
-import { EncryptedLocalFile } from "../file.js";
+import { EncryptableLocalFile } from "../file.js";
 import ContextMenu from "./ContextMenu.jsx";
+import { AESFileEncryptor } from "../cypher/aes.js";
+import { Algorithm } from "../cypher/base.js";
 
-type Props = { files: EncryptedLocalFile[], setFiles: Setter<EncryptedLocalFile[]>, selFile: number, CMPosition: any, setRef: any, Ref: any };
+type Props = { files: EncryptableLocalFile[], setFiles: Setter<EncryptableLocalFile[]>, selFile: number, CMPosition: any, setRef: any, Ref: any };
 
 function LocalContextMenu(props: Props) {
 
@@ -36,9 +38,23 @@ function LocalContextMenu(props: Props) {
 
   // create encrypt window
   function encryptFileOnClick() {
+    const aesEncryptor = new AESFileEncryptor("secret")
+    const file = props.files[props.selFile];
+    const encryptedFile = aesEncryptor.encryptFile(file);
+    props.setFiles((files) => {
+      files[props.selFile] = encryptedFile;
+      return files;
+    })
   }
 
   function decryptFileOnClick() {
+    const aesEncryptor = new AESFileEncryptor("secret")
+    const file = props.files[props.selFile];
+    const decrFile = aesEncryptor.decryptFile(file);
+    props.setFiles((files) => {
+      files[props.selFile] = decrFile;
+      return files;
+    })
   }
 
   function uploadFileOnClick() {
