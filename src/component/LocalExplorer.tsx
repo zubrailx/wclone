@@ -72,6 +72,7 @@ function LocalExplorer() {
 
   function removeFileOnClick() {
     setFiles((files) => {
+      console.log("removed file with idx ", selFile())
       files.splice(selFile(), 1);
       return files
     });
@@ -113,6 +114,7 @@ function LocalExplorer() {
     uploadFileOnClick: uploadFileOnClick
   }
 
+  // TODO: redo index of element if list
   return (
     <Explorer files={files()} selFile={selFile()} setSelFile={setSelFile}
       table={table} tableFunctions={setExplorerFunctions} setHeaderVisible={setHeaderVisible}
@@ -130,7 +132,7 @@ function LocalExplorer() {
             <TableHeadCell>Mime Type</TableHeadCell>
           </TableHeadRow>
           <For each={files()}>{(file, i) =>
-            <TableRow onContextMenu={explorerFunctions().onRowClick(i())}>
+            <TableRow onContextMenu={explorerFunctions().onRowClick(file)}>
               <TableCell>{Algorithm[file.getEncryptAlgorithm()]}</TableCell>
               <TableCell>{file.getName()}</TableCell>
               <TableCell>{file.getSize()}</TableCell>

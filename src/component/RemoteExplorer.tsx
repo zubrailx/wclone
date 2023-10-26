@@ -63,7 +63,7 @@ function RemoteExplorer() {
             <TableHeadCell>Mime Type</TableHeadCell>
           </TableHeadRow>
           <For each={files()}>{(file, i) =>
-            <TableRow onContextMenu={explorerFunctions().onRowClick(i())}>
+            <TableRow onContextMenu={explorerFunctions().onRowClick(files().indexOf(file))}>
               <TableCell>{file.getName()}</TableCell>
               <TableCell>{file.getSize()}</TableCell>
               <TableCell>{file.getCreatedTime().toLocaleString()}</TableCell>

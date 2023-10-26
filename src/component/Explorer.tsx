@@ -59,14 +59,14 @@ function Explorer(props: Props) {
   })
 
   // Context Menu
-  function onRowClick(i: number) {
+  function onRowClick(file: any) {
     return function(e: MouseEvent) {
       props.setCMPosition({ x: e.clientX, y: e.clientY });
       if (props.selFile == FILE_NOT_SELECTED) {
         window.addEventListener('contextmenu', unselectForContextMenu);
         window.addEventListener('click', unselectForClick);
       }
-      props.setSelFile(i);
+      props.setSelFile(props.files.indexOf(file));
     }
   }
 
