@@ -1,4 +1,4 @@
-import { createEffect, createSignal } from "solid-js";
+import { createSignal } from "solid-js";
 import { For } from "solid-js";
 import { EncryptableLocalFile, fromFile } from "../localfile.js";
 import LocalContextMenu, { LFileCap } from "./LocalContextMenu.jsx";
@@ -6,12 +6,15 @@ import { Algorithm } from "../cypher/base.js";
 import Explorer, { ExplorerFunctions, FILE_NOT_SELECTED } from "./Explorer.jsx";
 import { Table, TableCell, TableHeadCell, TableHeadRow, TableRow } from "./Table.jsx";
 import { AESFileEncryptor } from "../cypher/aes.js";
+import { useDriveAPI } from "./DriveProvider.jsx";
 
 function log(...msg: any) {
   return console.log('[LocalExplorer]:', ...msg)
 }
 
 function LocalExplorer() {
+  const [api, _] = useDriveAPI();
+
   const [files, setFiles] = createSignal<EncryptableLocalFile[]>([], { equals: false });
   const [selFile, setSelFile] = createSignal(FILE_NOT_SELECTED);
 
@@ -83,8 +86,8 @@ function LocalExplorer() {
     })
   }
 
-  function uploadFileOnClick() {
-    alert('uploaded!')
+  async function uploadFileOnClick() {
+    api.upload(files()[selFile()]).then((r) => console.log(r))
     setCMVisible(false);
   }
 

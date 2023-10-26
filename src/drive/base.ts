@@ -1,3 +1,5 @@
+import { EncryptableLocalFile } from "../localfile.js";
+
 export interface DriveFileMeta {
   getName(): string;
   getSize(): number;
@@ -7,6 +9,8 @@ export interface DriveFileMeta {
 
 export interface DriveOperations {
   ls(pageSize: number, query: string): Promise<DriveFileMeta[]>;
+  upload(file: EncryptableLocalFile): Promise<DriveFileMeta>;
+  get(file: DriveFileMeta): Promise<EncryptableLocalFile>;
 };
 
 export interface DriveAPI extends DriveOperations {

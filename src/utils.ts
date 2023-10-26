@@ -58,6 +58,11 @@ export function bytesToBase64(bytes: Uint8Array): string {
   return btoa(binString);
 }
 
+export function bytesArrToBase64(bytesArr: Uint8Array[]): string {
+  const binString = bytesArr.map((bytes) => String.fromCodePoint(...bytes)).join('')
+  return btoa(binString);
+}
+
 export function Uint8ArrayToCryptJsWordArray(u8Array: Uint8Array) {
   return CryptoJS.lib.WordArray.create(u8Array as any);
 }
