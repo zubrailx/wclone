@@ -8,8 +8,20 @@ import { Table, TableCell, TableHeadCell, TableHeadRow, TableRow } from "./Table
 import { AESFileEncryptor } from "../cypher/aes.js";
 import { useDriveAPI } from "./DriveProvider.jsx";
 
+const DEFAULT_SECRET_KEY = "secret"
+
 function log(...msg: any) {
   return console.log('[LocalExplorer]:', ...msg)
+}
+
+function getSecretKey() {
+  let secretKey = window.localStorage.getItem("AESSecretKey")
+
+  if (secretKey == null) {
+    console.log("using default key:", DEFAULT_SECRET_KEY)
+    secretKey = DEFAULT_SECRET_KEY;
+  }
+  return secretKey;
 }
 
 function LocalExplorer() {
@@ -67,7 +79,8 @@ function LocalExplorer() {
 
   // create encrypt window
   function encryptFileOnClick() {
-    const aesEncryptor = new AESFileEncryptor("secret")
+    const secretKey = getSecretKey();
+    const aesEncryptor = new AESFileEncryptor(secretKey);
     const file = files()[selFile()];
     const encryptedFile = aesEncryptor.encryptFile(file);
     setFiles((files) => {
@@ -77,7 +90,8 @@ function LocalExplorer() {
   }
 
   function decryptFileOnClick() {
-    const aesEncryptor = new AESFileEncryptor("secret")
+    const secretKey = getSecretKey();
+    const aesEncryptor = new AESFileEncryptor(secretKey)
     const file = files()[selFile()];
     const decrFile = aesEncryptor.decryptFile(file);
     setFiles((files) => {
