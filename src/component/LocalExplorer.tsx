@@ -50,7 +50,7 @@ function LocalExplorer() {
   async function inputFileOnChange(event: any) {
     const fileList: FileList = event.target.files;
     for (const file of fileList) {
-      const newFile = new EncryptableLocalFile(await fromFile(file), Algorithm.NONE);
+      const newFile = new EncryptableLocalFile(await fromFile(file), Algorithm.NONE_OR_UNK);
       setFiles((files) => {
         return [...files, newFile]
       });

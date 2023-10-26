@@ -1,8 +1,8 @@
 import { EncryptableLocalFile, LocalFile } from "../localfile.js";
 
 export enum Algorithm {
-  NONE = 0,
-  AES = 1
+  NONE_OR_UNK = 0,
+  AES = 1,
 }
 
 export abstract class Encryptor {
@@ -36,7 +36,7 @@ export abstract class LocalFileEncryptor extends Encryptor {
     const decryptedContent = this.decrypt(file.getContent());
     const localfile = new LocalFile(file.getName(), decryptedContent.reduce((a, b) => a + b.length, 0), file.getMimeType(),
       file.getModifiedTime(), decryptedContent);
-    return new EncryptableLocalFile(localfile, Algorithm.NONE);
+    return new EncryptableLocalFile(localfile, Algorithm.NONE_OR_UNK);
   }
 
 }
