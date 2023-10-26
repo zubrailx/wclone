@@ -1,35 +1,18 @@
-import { Setter, createEffect, createSignal, onMount } from "solid-js";
+import { Setter, createSignal, onMount } from "solid-js";
 import { EncryptedLocalFile } from "../file.js";
+import ContextMenu from "./ContextMenu.jsx";
 
-const NOT_SELECTED = -1;
+type Props = { files: EncryptedLocalFile[], setFiles: Setter<EncryptedLocalFile[]>, selFile: number, CMPosition: any, setRef: any, Ref: any };
 
-function LocalContextMenu(props: { files: EncryptedLocalFile[], setFiles: Setter<EncryptedLocalFile[]>, selFile: number, CMPosition: any, setRef: any }) {
+function LocalContextMenu(props: Props) {
 
   const [CMVisible, setCMVisible] = createSignal(false);
+
   let root: any
 
   onMount(() => {
     props.setRef(root);
   })
-
-  createEffect(() => {
-    if (props.selFile == NOT_SELECTED) {
-      setCMVisible(false);
-    } else {
-      setCMVisible(true);
-    }
-  })
-
-  createEffect(() => {
-    if (CMVisible()) {
-      setContextMenuPosition(props.CMPosition.x, props.CMPosition.y);
-    }
-  })
-
-  function setContextMenuPosition(x: number, y: number) {
-    root!.style.left = `${x}px`;
-    root!.style.top = `${y}px`;
-  }
 
   function downloadFileOnClick() {
     const localFile = props.files[props.selFile];
@@ -62,23 +45,29 @@ function LocalContextMenu(props: { files: EncryptedLocalFile[], setFiles: Setter
   }
 
   return (
-    <div ref={root} class='contextmenu' style={{ visibility: CMVisible() ? 'visible' : 'hidden' }}>
-      <div onClick={uploadFileOnClick} class='element'>
-        <span>Upload</span>
+    <ContextMenu selFile={props.selFile} CMPosition={props.CMPosition}
+      setCMVisible={setCMVisible} CMVisible={CMVisible()} root={props.Ref}>
+
+      <div ref={root} class='contextmenu' style={{ visibility: CMVisible() ? 'visible' : 'hidden' }}>
+        <div onClick={uploadFileOnClick} class='element'>
+          <span>Upload</span>
+        </div>
+        <div onClick={downloadFileOnClick} class='element'>
+          <span>Download</span>
+        </div>
+        <div onClick={removeFileOnClick} class='element'>
+          <span>Remove</span>
+        </div>
+        <div onClick={encryptFileOnClick} class='element'>
+          <span>Encrypt</span>
+        </div>
+        <div onClick={decryptFileOnClick} class='element'>
+          <span>Decrypt</span>
+        </div>
       </div>
-      <div onClick={downloadFileOnClick} class='element'>
-        <span>Download</span>
-      </div>
-      <div onClick={removeFileOnClick} class='element'>
-        <span>Remove</span>
-      </div>
-      <div onClick={encryptFileOnClick} class='element'>
-        <span>Encrypt</span>
-      </div>
-      <div onClick={decryptFileOnClick} class='element'>
-        <span>Decrypt</span>
-      </div>
-    </div>
+
+    </ContextMenu>
+
   )
 }
 

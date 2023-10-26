@@ -1,11 +1,9 @@
-import { createEffect, createSignal, onCleanup } from "solid-js";
+import { createSignal } from "solid-js";
 import { For } from "solid-js";
 import { EncryptedLocalFile, fromFile } from "../file.js";
 import LocalContextMenu from "./LocalContextMenu.jsx";
 import { Algorithm } from "../cypher/base.js";
-import Explorer, { ExplorerFunctions } from "./Explorer.jsx";
-
-const NOT_SELECTED = -1;
+import Explorer, { ExplorerFunctions, FILE_NOT_SELECTED } from "./Explorer.jsx";
 
 function log(...msg: any) {
   return console.log('[LocalExplorer]:', ...msg)
@@ -13,7 +11,7 @@ function log(...msg: any) {
 
 function LocalExplorer() {
   const [files, setFiles] = createSignal<EncryptedLocalFile[]>([], { equals: false });
-  const [selFile, setSelFile] = createSignal(NOT_SELECTED);
+  const [selFile, setSelFile] = createSignal(FILE_NOT_SELECTED);
   const [CMPosition, setCMPosition] = createSignal({ x: 0, y: 0 });
   const [contextMenu, setContextMenu] = createSignal();
   const [explorerFunctions, setExplorerFunctions] = createSignal<ExplorerFunctions>({
@@ -51,7 +49,8 @@ function LocalExplorer() {
             </tr>
           }</For>
         </div>
-        <LocalContextMenu setRef={setContextMenu} files={files()} setFiles={setFiles} selFile={selFile()} CMPosition={CMPosition()} />
+        <LocalContextMenu files={files()} setFiles={setFiles} selFile={selFile()}
+          CMPosition={CMPosition()} setRef={setContextMenu} Ref={contextMenu()} />
       </div>
 
     </Explorer>

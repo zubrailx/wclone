@@ -1,10 +1,8 @@
-import { For, createEffect, createSignal, onCleanup } from "solid-js";
+import { For, createEffect, createSignal } from "solid-js";
 import { DriveFileInfo } from "../backend/base.js";
 import { useDriveCtx } from "./DriveProvider.jsx";
 import RemoteContextMenu from "./RemoteContextMenu.jsx";
-import Explorer, { ExplorerFunctions } from "./Explorer.jsx";
-
-const NOT_SELECTED = -1;
+import Explorer, { ExplorerFunctions, FILE_NOT_SELECTED } from "./Explorer.jsx";
 
 function log(...msg: any) {
   return console.log('[RemoteExplorer]:', ...msg)
@@ -12,7 +10,7 @@ function log(...msg: any) {
 
 function RemoteExplorer() {
   const [ctx, _] = useDriveCtx();
-  const [selFile, setSelFile] = createSignal(NOT_SELECTED);
+  const [selFile, setSelFile] = createSignal(FILE_NOT_SELECTED);
   const [files, changeFiles] = createSignal<DriveFileInfo[]>([]);
   const [query, changeQuery] = createSignal("parents in 'root'");
   const [contextMenu, setContextMenu] = createSignal();
@@ -51,7 +49,8 @@ function RemoteExplorer() {
             </tr>
           }</For>
         </div>
-        <RemoteContextMenu setRef={setContextMenu} selFile={selFile()} CMPosition={CMPosition()} />
+        <RemoteContextMenu selFile={selFile()} CMPosition={CMPosition()}
+          setRef={setContextMenu} Ref={contextMenu()} />
       </div>
 
     </Explorer>
