@@ -26,3 +26,9 @@ Your app is ready to be deployed!
 ## Deployment
 
 Learn more about deploying your application with the [documentations](https://vitejs.dev/guide/static-deploy.html)
+
+## TODO
+
+Maybe:
+
+- [ ] Create wrapper on content to store information about used algorithm (or store it in content)
