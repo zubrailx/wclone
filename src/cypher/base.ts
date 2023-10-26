@@ -27,14 +27,14 @@ export abstract class LocalFileEncryptor extends Encryptor {
 
   encryptFile(file: EncryptableLocalFile): EncryptableLocalFile {
     const encryptedContent = this.encrypt(file.getContent());
-    const localfile = new LocalFile(file.getName(), file.getSize(), file.getMimeType(),
+    const localfile = new LocalFile(file.getName(), encryptedContent.reduce((a, b) => a + b.length, 0), file.getMimeType(),
       file.getModifiedTime(), encryptedContent);
     return new EncryptableLocalFile(localfile, this.getAlgorithm());
   }
 
   decryptFile(file: EncryptableLocalFile): EncryptableLocalFile {
     const decryptedContent = this.decrypt(file.getContent());
-    const localfile = new LocalFile(file.getName(), file.getSize(), file.getMimeType(),
+    const localfile = new LocalFile(file.getName(), decryptedContent.reduce((a, b) => a + b.length, 0), file.getMimeType(),
       file.getModifiedTime(), decryptedContent);
     return new EncryptableLocalFile(localfile, Algorithm.NONE);
   }
