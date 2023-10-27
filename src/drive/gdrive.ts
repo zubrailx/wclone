@@ -60,43 +60,52 @@ export class GDriveAPI implements DriveAPI {
   public load(): void {
     loadScript("https://apis.google.com/js/api.js", () => {
       this.gapiLoaded = true;
+      gapi.load('client', {})
     });
     loadScript("https://accounts.google.com/gsi/client", () => {
       this.gisLoaded = true;
     });
+
   }
 
-  public async init(client_id: String, api_key: String): Promise<void> {
+  public async init(client_id: string, api_key: string): Promise<void> {
     this.CLIENT_ID = client_id
     this.API_KEY = api_key
 
+    await this.initTokenClient();
+    await this.requestAPIAccessToken();
+
+    this.logged = true;
+  }
+
+  private async initTokenClient() {
     if (this.gapiLoaded && this.gisLoaded) {
-      this.tokenClient = google.accounts.oauth2.initTokenClient({
+      this.tokenClient = await google.accounts.oauth2.initTokenClient({
         client_id: this.CLIENT_ID,
         scope: SCOPES,
-      });
-      this.gisInited = true;
-
-      const self = this;
-
-      gapi.load('client', {
-        callback: async function() {
-          await gapi.client.init({
-            apiKey: self.API_KEY,
-            discoveryDocs: [DISCOVERY_DOC],
-          });
-          self.gapiInited = true;
-
-          if (gapi.client.getToken() === null) {
-            await self.tokenClient.requestAccessToken({ prompt: 'consent' });
-          } else {
-            await self.tokenClient.requestAccessToken({ prompt: '' });
+        callback: async (tokenResponse: any) => {
+          if (tokenResponse && tokenResponse.access_token) {
+            // gapi.client token already set
+            await gapi.client.init({
+              apiKey: this.API_KEY,
+              discoveryDocs: [DISCOVERY_DOC],
+            });
+            this.gapiInited = true;
           }
-          self.logged = true;
         }
       });
+      this.gisInited = true;
     } else {
-      throw 'gapi or gis is not inited';
+      throw 'gapi or gis is not loaded';
+    }
+  }
+
+  // calls callback above
+  private async requestAPIAccessToken() {
+    if (gapi.client.getToken() === null) {
+      await this.tokenClient.requestAccessToken({ prompt: 'consent' });
+    } else {
+      await this.tokenClient.requestAccessToken({ prompt: '' });
     }
   }
 
