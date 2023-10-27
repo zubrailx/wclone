@@ -66,7 +66,8 @@ function Explorer(props: Props) {
         window.addEventListener('contextmenu', unselectForContextMenu);
         window.addEventListener('click', unselectForClick);
       }
-      props.setSelFile(props.files.indexOf(file));
+      const selFile = props.files.indexOf(file);
+      props.setSelFile(selFile);
     }
   }
 
