@@ -1,6 +1,6 @@
 import { For, createEffect, createSignal } from "solid-js";
 import { DriveFileMeta } from "../drive/base.js";
-import { useDriveAPI } from "./DriveProvider.jsx";
+import { useApiContext } from "./DriveProvider.jsx";
 import RemoteContextMenu, { RFileCap } from "./RemoteContextMenu.jsx";
 import Explorer, { ExplorerFunctions, FILE_NOT_SELECTED } from "./Explorer.jsx";
 import { Table, TableCell, TableHeadCell, TableHeadRow, TableRow } from "./Table.jsx";
@@ -10,7 +10,7 @@ function log(...msg: any) {
 }
 
 function RemoteExplorer() {
-  const [api, _] = useDriveAPI();
+  const [api, _] = useApiContext();
 
   const [files, changeFiles] = createSignal<DriveFileMeta[]>([]);
   const [selFile, setSelFile] = createSignal(FILE_NOT_SELECTED);

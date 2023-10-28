@@ -1,6 +1,6 @@
 import CryptoJS from 'crypto-js';
 
-export function loadScript(src: string, onLoad: () => void) {
+export async function loadScript(src: string, onLoad: () => void) {
   let script = document.createElement('script');
   script.src = src;
   script.async = true;
@@ -89,4 +89,14 @@ export function CryptJsWordArrayToUint8Array(wordArray: CryptoJS.lib.WordArray):
     result[i++] = (w & 0x000000ff);
   }
   return result;
+}
+
+export function until(cond: () => boolean) {
+
+  const poll = (resolve: any) => {
+    if (cond()) resolve();
+    else setTimeout((_: any) => poll(resolve), 400);
+  }
+
+  return new Promise(poll);
 }

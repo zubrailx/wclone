@@ -1,19 +1,22 @@
 import './App.scss'
 
-import BackendAuth from "./BackendAuth.jsx";
-import { DriveProvider } from './DriveProvider.jsx';
-import { GDriveAPI } from '../drive/gdrive.js';
-import RemoteExplorer from './RemoteExplorer.jsx';
-import LocalExplorer from './LocalExplorer.jsx';
+import { createSignal } from 'solid-js';
+import AddRemoteSection from './remote/AddRemoteSection.jsx';
+import { DriveRemote } from '../remote/base.js';
+import SelectRemoteSection from './remote/SelectRemoteSection.jsx';
+import { ApiProvider } from './DriveProvider.jsx';
 
 
 function App() {
+  const [remotes, setRemotes] = createSignal<DriveRemote[]>([]);
+
   return (
-    <DriveProvider api={new GDriveAPI()} >
-      <BackendAuth />
-      <RemoteExplorer />
-      <LocalExplorer />
-    </DriveProvider>
+    <>
+      <ApiProvider>
+        <AddRemoteSection setRemotes={setRemotes} />
+        <SelectRemoteSection remotes={remotes()} setRemotes={setRemotes} />
+      </ApiProvider>
+    </>
   )
 }
 

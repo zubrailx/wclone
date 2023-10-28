@@ -6,7 +6,7 @@ import { Algorithm } from "../cypher/base.js";
 import Explorer, { ExplorerFunctions, FILE_NOT_SELECTED } from "./Explorer.jsx";
 import { Table, TableCell, TableHeadCell, TableHeadRow, TableRow } from "./Table.jsx";
 import { AESFileEncryptor } from "../cypher/aes.js";
-import { useDriveAPI } from "./DriveProvider.jsx";
+import { useApiContext } from "./DriveProvider.jsx";
 
 const DEFAULT_SECRET_KEY = "secret"
 
@@ -25,7 +25,7 @@ function getSecretKey() {
 }
 
 function LocalExplorer() {
-  const [api, _] = useDriveAPI();
+  const [api, _] = useApiContext();
 
   const [files, setFiles] = createSignal<EncryptableLocalFile[]>([], { equals: false });
   const [selFile, setSelFile] = createSignal(FILE_NOT_SELECTED);
