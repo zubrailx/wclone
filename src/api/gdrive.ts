@@ -64,7 +64,7 @@ export class GDriveAPI implements DriveAPI {
     return this.gapiLoaded && this.gisLoaded;
   }
 
-  public async access(remote: GDriveRemote) {
+  public async access(remote: GDriveRemote, callback: Function) {
     if (this.gapiLoaded && this.gisLoaded) {
       const tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: remote.getClientId(),
@@ -73,6 +73,7 @@ export class GDriveAPI implements DriveAPI {
           if (tokenResponse && tokenResponse.access_token) {
             remote.setAccessToken(tokenResponse.access_token);
           }
+          callback();
         }
       })
       this.requestAPIAccessToken(remote, tokenClient);

@@ -18,6 +18,6 @@ export interface DriveOperations {
 export interface DriveAPI extends DriveOperations {
   isLoaded(): boolean;
   load(): Promise<void>;
-  access(remote: DriveRemote): Promise<void>;
+  access(remote: DriveRemote, callback: Function): Promise<void>;
   revoke(remote: DriveRemote): Promise<void>;
 };

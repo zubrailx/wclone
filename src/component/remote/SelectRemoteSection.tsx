@@ -1,10 +1,12 @@
 import { For, Setter, Switch, createEffect, createSignal } from "solid-js"
 import { DriveRemote } from "../../remote/base.js"
 import { useApiContext } from "../DriveProvider.jsx";
+import { SetStoreFunction, produce } from "solid-js/store";
+import { clone } from "../../utils.js";
 
 type Props = {
   remotes: DriveRemote[],
-  setRemotes: Setter<DriveRemote[]>,
+  setRemotes: SetStoreFunction<DriveRemote[]>,
 }
 
 type SelectEvent = Event & {
@@ -14,12 +16,12 @@ type SelectEvent = Event & {
 
 function SelectRemoteSection(props: Props) {
 
-  const [remote, setRemote] = createSignal<DriveRemote>();
+  const [selRemote, setSelRemote] = createSignal<DriveRemote>();
   const [_, { getRequiredApi }] = useApiContext()
 
   createEffect(() => {
-    if (props.remotes.length > 0 && remote() === undefined) {
-      setRemote(props.remotes[0]);
+    if (props.remotes.length > 0 && selRemote() === undefined) {
+      setSelRemote(props.remotes[0]);
     }
   })
 
@@ -29,42 +31,59 @@ function SelectRemoteSection(props: Props) {
 
   function displaySelectedRemote(e: SelectEvent) {
     const entry = findRemoteByValue(e.target.value)!;
-    setRemote(entry);
+    setSelRemote(entry);
   }
 
-  function refreshAccess() {
-    const rem = remote();
-    if (rem === undefined) {
+  function findRemoteBySelected(remotes: DriveRemote[], remote: DriveRemote) {
+    return remotes.find((rem) => rem.getName() == remote.getName());
+  }
+
+  async function refreshAccess() {
+    const selRem = selRemote();
+    if (selRem === undefined) {
       console.warn("remote is undefined");
       return;
     }
-    getRequiredApi(rem)
+    const rem = clone(findRemoteBySelected(props.remotes, selRem))!;
+    await getRequiredApi(rem)
       .then((api) => {
-        api.access(rem);
+        api.access(rem, () => {
+          setSelRemote(rem);
+          updateRemote(rem);
+        });
         return api;
       });
   }
 
-  function revokeAccess() {
-    const rem = remote();
-    if (rem === undefined) {
+  async function revokeAccess() {
+    const selRem = selRemote();
+    if (selRem === undefined) {
       console.warn("remote is undefined");
       return;
     }
+    const rem = clone(findRemoteBySelected(props.remotes, selRem)!);
     getRequiredApi(rem)
       .then((api) => {
         api.revoke(rem);
-        setRemote(rem);
+        setSelRemote(rem);
       })
+    updateRemote(rem);
   }
 
-  function deleteRemote() {
-    revokeAccess();
-    if (remote() != undefined) {
-      props.setRemotes((remotes) =>
-        remotes.filter((r) => r.getName() !== remote()!.getName()));
-      setRemote(undefined);
+  async function deleteRemote() {
+    await revokeAccess();
+    const selRem = selRemote();
+    if (selRemote() != undefined) {
+      const rem = findRemoteBySelected(props.remotes, selRem!)!; // not cloning
+      props.setRemotes(props.remotes.filter((r) => r != rem));
     }
+    setSelRemote(undefined);
+  }
+
+  function updateRemote(rem: DriveRemote) {
+    props.setRemotes(props.remotes.map(remote =>
+      rem.getName() == remote.getName() ? rem : remote
+    ));
   }
 
   return (
