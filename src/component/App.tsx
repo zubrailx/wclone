@@ -5,24 +5,30 @@ import { DriveRemote } from '../remote/base.js';
 import SelectRemoteSection from './remote/SelectRemoteSection.jsx';
 import { ApiProvider } from './DriveProvider.jsx';
 import { createStore } from 'solid-js/store';
-import { createEffect } from 'solid-js';
+import { createEffect, createSignal } from 'solid-js';
 import { storageGetRemotes, storageSetRemotes } from '../localstorage/remotes.js';
+import LocalExplorer from './LocalExplorer.jsx';
+import RemoteExplorer from './RemoteExplorer.jsx';
+import SelectCypherSection from './cypher/SelectCypherSection.jsx';
 
 function App() {
   const [remotes, setRemotes] = createStore<DriveRemote[]>(storageGetRemotes());
+  const [curRemote, setCurRemote] = createSignal<DriveRemote>();
 
   createEffect(() => {
     if (remotes) {
       storageSetRemotes(remotes);
     }
-    console.log(remotes);
   })
 
   return (
     <>
       <ApiProvider>
         <AddRemoteSection setRemotes={setRemotes} />
-        <SelectRemoteSection remotes={remotes} setRemotes={setRemotes} />
+        <SelectRemoteSection remotes={remotes} setRemotes={setRemotes} setCurRemote={setCurRemote} />
+        <SelectCypherSection />
+        <RemoteExplorer curRemote={curRemote()} />
+        <LocalExplorer curRemote={curRemote()} />
       </ApiProvider>
     </>
   )

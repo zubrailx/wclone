@@ -12,19 +12,19 @@ type ExplorerFunctions = {
 }
 
 type Props = {
-  files: any[],
-  selFile: number,
-  setSelFile: Setter<number>,
+  filesList: any[],
+  filesSelected: number,
+  filesSetSelected: Setter<number>,
 
   table: unknown,
-  setHeaderVisible: Setter<boolean>,
+  tableSetHeaderVisible: Setter<boolean>,
   tableFunctions: Setter<ExplorerFunctions>,
 
   CMVisible: boolean,
-  setCMVisible: Setter<boolean>,
+  CMSetVisible: Setter<boolean>,
   CMPosition: Position,
-  setCMPosition: Setter<Position>,
-  contextMenu: any,
+  CMSetPosition: Setter<Position>,
+  CMElement: any,
 
   log: Function,
 
@@ -49,34 +49,34 @@ function Explorer(props: Props) {
 
   // Files
   createEffect(() => {
-    if (props.files) {
-      props.setSelFile(FILE_NOT_SELECTED);
+    if (props.filesList) {
+      props.filesSetSelected(FILE_NOT_SELECTED);
     }
   });
 
   createEffect(() => {
-    props.setHeaderVisible(props.files.length > 0)
+    props.tableSetHeaderVisible(props.filesList.length > 0)
   })
 
   // Context Menu
   function onRowClick(file: any) {
     return function(e: MouseEvent) {
-      props.setCMPosition({ x: e.clientX, y: e.clientY });
-      if (props.selFile == FILE_NOT_SELECTED) {
+      props.CMSetPosition({ x: e.clientX, y: e.clientY });
+      if (props.filesSelected == FILE_NOT_SELECTED) {
         window.addEventListener('contextmenu', unselectForContextMenu);
         window.addEventListener('click', unselectForClick);
       }
-      const selFile = props.files.indexOf(file);
-      props.setSelFile(selFile);
+      const selFile = props.filesList.indexOf(file);
+      props.filesSetSelected(selFile);
     }
   }
 
   createEffect(() => {
-    if (props.selFile == FILE_NOT_SELECTED) {
+    if (props.filesSelected == FILE_NOT_SELECTED) {
       window.removeEventListener('contextmenu', unselectForContextMenu);
       window.removeEventListener('click', unselectForClick);
     }
-    props.log('selected file =', props.selFile);
+    props.log('selected file =', props.filesSelected);
   })
 
   function unselectForClick(ev: MouseEvent) {
@@ -84,11 +84,11 @@ function Explorer(props: Props) {
     const y = ev.clientY;
     const elementsUnder = document.elementsFromPoint(x, y);
     for (const elem of elementsUnder) {
-      if (elem == props.contextMenu) {
+      if (elem == props.CMElement) {
         return;
       }
     }
-    props.setSelFile(FILE_NOT_SELECTED);
+    props.filesSetSelected(FILE_NOT_SELECTED);
   }
 
   function unselectForContextMenu(ev: MouseEvent) {
@@ -97,18 +97,18 @@ function Explorer(props: Props) {
     const y = ev.clientY;
     const elementsUnder = document.elementsFromPoint(x, y);
     for (const elem of elementsUnder) {
-      if (elem == props.table || elem == props.contextMenu) {
+      if (elem == props.table || elem == props.CMElement) {
         return;
       }
     }
-    props.setSelFile(FILE_NOT_SELECTED);
+    props.filesSetSelected(FILE_NOT_SELECTED);
   }
 
   createEffect(() => {
-    if (props.selFile == FILE_NOT_SELECTED) {
-      props.setCMVisible(false);
+    if (props.filesSelected == FILE_NOT_SELECTED) {
+      props.CMSetVisible(false);
     } else {
-      props.setCMVisible(true);
+      props.CMSetVisible(true);
     }
   })
 

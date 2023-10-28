@@ -100,8 +100,12 @@ export class GDriveAPI implements DriveAPI {
 
   private async initClient(remote: GDriveRemote) {
     return gapi.client.init({
-      apiKey: remote.getAccessToken(),
+      apiKey: remote.getApiKey(),
       discoveryDocs: [DISCOVERY_DOC],
+    }).then(() => {
+      gapi.client.setToken({
+        access_token: remote.getAccessToken()
+      })
     });
   }
 

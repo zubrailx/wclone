@@ -1,18 +1,23 @@
 import { For, createEffect, createSignal } from "solid-js";
-import { DriveFileMeta } from "../drive/base.js";
+import { DriveFileMeta } from "../api/base.js";
 import { useApiContext } from "./DriveProvider.jsx";
 import RemoteContextMenu, { RFileCap } from "./RemoteContextMenu.jsx";
 import Explorer, { ExplorerFunctions, FILE_NOT_SELECTED } from "./Explorer.jsx";
 import { Table, TableCell, TableHeadCell, TableHeadRow, TableRow } from "./Table.jsx";
+import { DriveRemote } from "../remote/base.js";
 
 function log(...msg: any) {
   return console.log('[RemoteExplorer]:', ...msg)
 }
 
-function RemoteExplorer() {
-  const [api, _] = useApiContext();
+type Props = {
+  curRemote: DriveRemote | undefined,
+}
 
-  const [files, changeFiles] = createSignal<DriveFileMeta[]>([]);
+function RemoteExplorer(props: Props) {
+  const [_, { getRequiredApi }] = useApiContext();
+
+  const [files, setFiles] = createSignal<DriveFileMeta[]>([]);
   const [selFile, setSelFile] = createSignal(FILE_NOT_SELECTED);
 
   const [query, changeQuery] = createSignal("parents in 'root'");
@@ -32,13 +37,21 @@ function RemoteExplorer() {
 
   // Files
   createEffect(() => {
-    if (api.isLogged() == false) {
-      changeFiles((_) => []);
+    if (props.curRemote !== undefined) {
+      setFiles([]);
     }
-  });
+  })
 
   async function handleListClick() {
-    changeFiles(await api.ls(10, query()));
+    if (props.curRemote !== undefined) {
+      getRequiredApi(props.curRemote)
+        .then(api => {
+          return api.ls(props.curRemote!, 10, query())
+        })
+        .then(res => {
+          setFiles(res);
+        })
+    }
   }
 
   const fn = {
@@ -48,12 +61,13 @@ function RemoteExplorer() {
   }
 
   return (
-    <Explorer files={files()} selFile={selFile()} setSelFile={setSelFile}
-      table={table} tableFunctions={setExplorerFunctions} setHeaderVisible={setHeaderVisible}
-      CMVisible={CMVisible()} setCMVisible={setCMVisible} CMPosition={CMPosition()}
-      setCMPosition={setCMPosition} contextMenu={contextMenu()} log={log}>
+    <Explorer filesList={files()} filesSelected={selFile()} filesSetSelected={setSelFile}
+      table={table} tableFunctions={setExplorerFunctions} tableSetHeaderVisible={setHeaderVisible}
+      CMVisible={CMVisible()} CMSetVisible={setCMVisible} CMPosition={CMPosition()}
+      CMSetPosition={setCMPosition} CMElement={contextMenu()} log={log}>
 
       <div class='remotefile'>
+        <h3>Remote explorer</h3>
         <button onClick={handleListClick}>List remote files</button>
         <Table ref={table}>
           <TableHeadRow visible={headerVisible()}>

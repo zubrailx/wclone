@@ -1,12 +1,13 @@
-import { For, Setter, Switch, createEffect, createSignal } from "solid-js"
+import { For, Setter, createEffect, createSignal } from "solid-js"
 import { DriveRemote } from "../../remote/base.js"
 import { useApiContext } from "../DriveProvider.jsx";
-import { SetStoreFunction, produce } from "solid-js/store";
+import { SetStoreFunction } from "solid-js/store";
 import { clone } from "../../utils.js";
 
 type Props = {
   remotes: DriveRemote[],
   setRemotes: SetStoreFunction<DriveRemote[]>,
+  setCurRemote: Setter<DriveRemote | undefined>,
 }
 
 type SelectEvent = Event & {
@@ -23,6 +24,10 @@ function SelectRemoteSection(props: Props) {
     if (props.remotes.length > 0 && selRemote() === undefined) {
       setSelRemote(props.remotes[0]);
     }
+  })
+
+  createEffect(() => {
+    props.setCurRemote(selRemote());
   })
 
   function findRemoteByValue(value: string) {

@@ -6,26 +6,20 @@ import { Algorithm } from "../cypher/base.js";
 import Explorer, { ExplorerFunctions, FILE_NOT_SELECTED } from "./Explorer.jsx";
 import { Table, TableCell, TableHeadCell, TableHeadRow, TableRow } from "./Table.jsx";
 import { AESFileEncryptor } from "../cypher/aes.js";
+import { storageGetSecretKey } from "../localstorage/localExplorer.js";
+import { DriveRemote } from "../remote/base.js";
 import { useApiContext } from "./DriveProvider.jsx";
 
-const DEFAULT_SECRET_KEY = "secret"
+type Props = {
+  curRemote: DriveRemote | undefined,
+}
 
 function log(...msg: any) {
   return console.log('[LocalExplorer]:', ...msg)
 }
 
-function getSecretKey() {
-  let secretKey = window.localStorage.getItem("AESSecretKey")
-
-  if (secretKey == null) {
-    console.log("using default key:", DEFAULT_SECRET_KEY)
-    secretKey = DEFAULT_SECRET_KEY;
-  }
-  return secretKey;
-}
-
-function LocalExplorer() {
-  const [api, _] = useApiContext();
+function LocalExplorer(props: Props) {
+  const [_, { getRequiredApi }] = useApiContext();
 
   const [files, setFiles] = createSignal<EncryptableLocalFile[]>([], { equals: false });
   const [selFile, setSelFile] = createSignal(FILE_NOT_SELECTED);
@@ -80,7 +74,7 @@ function LocalExplorer() {
 
   // create encrypt window
   function encryptFileOnClick() {
-    const secretKey = getSecretKey();
+    const secretKey = storageGetSecretKey();
     const aesEncryptor = new AESFileEncryptor(secretKey);
     const file = files()[selFile()];
     const encryptedFile = aesEncryptor.encryptFile(file);
@@ -91,7 +85,7 @@ function LocalExplorer() {
   }
 
   function decryptFileOnClick() {
-    const secretKey = getSecretKey();
+    const secretKey = storageGetSecretKey();
     const aesEncryptor = new AESFileEncryptor(secretKey)
     const file = files()[selFile()];
     const decrFile = aesEncryptor.decryptFile(file);
@@ -102,7 +96,14 @@ function LocalExplorer() {
   }
 
   async function uploadFileOnClick() {
-    api.upload(files()[selFile()]).then((r) => console.log(r))
+    if (props.curRemote !== undefined) {
+      getRequiredApi(props.curRemote)
+        .then(api => {
+          return api.upload(props.curRemote!, files()[selFile()])
+        }).then((res) => {
+          console.log(res);
+        })
+    }
     setCMVisible(false);
   }
 
@@ -114,14 +115,14 @@ function LocalExplorer() {
     uploadFileOnClick: uploadFileOnClick
   }
 
-  // TODO: redo index of element if list
   return (
-    <Explorer files={files()} selFile={selFile()} setSelFile={setSelFile}
-      table={table} tableFunctions={setExplorerFunctions} setHeaderVisible={setHeaderVisible}
-      CMVisible={CMVisible()} setCMVisible={setCMVisible} CMPosition={CMPosition()}
-      setCMPosition={setCMPosition} contextMenu={contextMenu()} log={log}>
+    <Explorer filesList={files()} filesSelected={selFile()} filesSetSelected={setSelFile}
+      table={table} tableFunctions={setExplorerFunctions} tableSetHeaderVisible={setHeaderVisible}
+      CMVisible={CMVisible()} CMSetVisible={setCMVisible} CMPosition={CMPosition()}
+      CMSetPosition={setCMPosition} CMElement={contextMenu()} log={log}>
 
       <div class='localfile'>
+        <h3>Local explorer</h3>
         <input type="file" ref={inputFile} onChange={inputFileOnChange} value="Upload" multiple />
         <Table ref={table}>
           <TableHeadRow visible={headerVisible()}>
