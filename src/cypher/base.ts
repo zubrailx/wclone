@@ -17,8 +17,8 @@ export abstract class Encryptor {
     return this.algorithm;
   }
 
-  abstract encrypt(data: Uint8Array[]): Uint8Array[]
-  abstract decrypt(data: Uint8Array[]): Uint8Array[]
+  abstract encrypt(data: Uint8Array[]): Promise<Uint8Array[]>
+  abstract decrypt(data: Uint8Array[]): Promise<Uint8Array[]>
 };
 
 export abstract class LocalFileEncryptor extends Encryptor {
@@ -26,15 +26,15 @@ export abstract class LocalFileEncryptor extends Encryptor {
     super(algorithm);
   }
 
-  encryptFile(file: EncryptableLocalFile): EncryptableLocalFile {
-    const encryptedContent = this.encrypt(file.getContent());
+  async encryptFile(file: EncryptableLocalFile): Promise<EncryptableLocalFile> {
+    const encryptedContent = await this.encrypt(file.getContent());
     const localfile = new LocalFile(file.getName(), encryptedContent.reduce((a, b) => a + b.length, 0), file.getMimeType(),
       file.getModifiedTime(), encryptedContent);
     return new EncryptableLocalFile(localfile, this.getAlgorithm());
   }
 
-  decryptFile(file: EncryptableLocalFile): EncryptableLocalFile {
-    const decryptedContent = this.decrypt(file.getContent());
+  async decryptFile(file: EncryptableLocalFile): Promise<EncryptableLocalFile> {
+    const decryptedContent = await this.decrypt(file.getContent());
     const localfile = new LocalFile(file.getName(), decryptedContent.reduce((a, b) => a + b.length, 0), file.getMimeType(),
       file.getModifiedTime(), decryptedContent);
     return new EncryptableLocalFile(localfile, Algorithm.NONE_OR_UNK);

@@ -74,30 +74,30 @@ function LocalExplorer(props: Props) {
     });
   }
 
-  // create encrypt window
-  function encryptFileOnClick() {
+  async function encryptFileOnClick() {
     const file = props.files[selFile()];
-    const encryptedFile = props.cypher.encryptFile(file);
-    props.setFiles((files) => {
-      files[selFile()] = encryptedFile;
-      return files;
-    })
+    props.cypher.encryptFile(file)
+      .then((r) => {
+        props.setFiles((files) => files.map((f) => f == file ? r : f));
+      })
+    setCMVisible(false);
   }
 
-  function decryptFileOnClick() {
+  async function decryptFileOnClick() {
     const file = props.files[selFile()];
-    const decrFile = props.cypher.decryptFile(file);
-    props.setFiles((files) => {
-      files[selFile()] = decrFile;
-      return files;
-    })
+    props.cypher.decryptFile(file)
+      .then((r) => {
+        props.setFiles((files) => files.map((f) => f == file ? r : f));
+      })
+    setCMVisible(false);
   }
 
   async function uploadFileOnClick() {
     if (props.curRemote !== undefined) {
+      const file = props.files[selFile()];
       getRequiredApi(props.curRemote)
         .then(api => {
-          return api.upload(props.curRemote!, props.pwd, props.files[selFile()])
+          return api.upload(props.curRemote!, props.pwd, file);
         }).then((res) => {
           console.log(res);
         })

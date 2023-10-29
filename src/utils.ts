@@ -49,16 +49,20 @@ export async function readStreamChunks(stream: ReadableStream<Uint8Array>) {
 }
 
 export function base64ToBytes(base64: string): Uint8Array {
-  const binString = atob(base64);
-  return Uint8Array.from(binString, (m) => m.codePointAt(0)!);
+  return Uint8Array.from(atob(base64), c => c.charCodeAt(0))
 }
 
 export function bytesToBase64(bytes: Uint8Array): string {
-  const binString = String.fromCodePoint(...bytes);
-  return btoa(binString);
+  var binary = '';
+  var len = bytes.byteLength;
+  for (var i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return window.btoa(binary);
 }
 
 export function bytesArrToBase64(bytesArr: Uint8Array[]): string {
+  console.log(bytesArr);
   const binString = bytesArr.map((bytes) => String.fromCodePoint(...bytes)).join('')
   return btoa(binString);
 }
@@ -117,4 +121,21 @@ export function max<T>(left: T, right: T): T {
     return right;
   }
   return left;
+}
+
+export function mergeUint8Array(arrays: Uint8Array[]) {
+  // Get the total length of all arrays.
+  let length = 0;
+  arrays.forEach(item => {
+    length += item.length;
+  });
+
+  // Create a new array with total length and merge all source arrays.
+  let mergedArray = new Uint8Array(length);
+  let offset = 0;
+  arrays.forEach(item => {
+    mergedArray.set(item, offset);
+    offset += item.length;
+  });
+  return mergedArray;
 }

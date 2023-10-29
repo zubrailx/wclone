@@ -1,7 +1,7 @@
 import { Algorithm } from "../cypher/base.js";
 import { EncryptableLocalFile, LocalFile } from "../localfile.js";
 import { GDriveRemote } from "../remote/gdrive.js";
-import { loadScript, until } from "../utils.js";
+import { loadScript, readStreamChunks, until } from "../utils.js";
 import { DriveFileMeta as DriveFileMeta, DriveAPI } from "./base.js";
 
 declare var gapi: any;
@@ -219,11 +219,12 @@ export class GDriveAPI implements DriveAPI {
           })
         });
       }).then((res) => {
-        return res.arrayBuffer();
+        return res.blob();
       })
-      .then((res) => {
+      .then(async (res) => {
+        const chunks = await readStreamChunks(res.stream());
         return new EncryptableLocalFile(
-          new LocalFile(meta.name!, meta.size!, meta.mimeType!, meta.createdTime!, [new Uint8Array(res)]), Algorithm.NONE_OR_UNK);
+          new LocalFile(meta.name!, meta.size!, meta.mimeType!, meta.createdTime!, chunks), Algorithm.NONE_OR_UNK);
       })
   }
 
