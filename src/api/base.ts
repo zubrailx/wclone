@@ -3,6 +3,8 @@ import { DriveRemote } from "../remote/base.js";
 
 export interface DriveFileMeta {
   getName(): string;
+  getId(): string;
+  setName(name: string): void;
   getSize(): number;
   getMimeType(): string;
   getCreatedTime(): Date;

@@ -30,8 +30,16 @@ class GDriveFileMeta implements DriveFileMeta {
     this.createdTime = createdTime!;
   }
 
+  getId(): string {
+    return this.id;
+  }
+
   getName(): string {
     return this.name;
+  }
+
+  setName(name: string) {
+    this.name = name;
   }
 
   getSize(): number {

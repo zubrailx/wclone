@@ -1,4 +1,4 @@
-import { For, Setter, createEffect, createSignal } from "solid-js";
+import { For, Setter, Show, createEffect, createSignal } from "solid-js";
 import { DriveFileMeta } from "../../api/base.js";
 import { useApiContext } from "./../DriveProvider.jsx";
 import RemoteContextMenu, { RFileCap } from "./RemoteContextMenu.jsx";
@@ -7,6 +7,7 @@ import { Table, TableCell, TableHeadCell, TableHeadRow, TableRow } from "./Table
 import { DriveRemote } from "../../remote/base.js";
 import { LocalFileEncryptor } from "../../cypher/base.js";
 import { EncryptableLocalFile } from "../../localfile.js";
+import { clone } from "../../utils.js";
 
 function log(...msg: any) {
   return console.log('[RemoteExplorer]:', ...msg)
@@ -35,6 +36,7 @@ function RemoteExplorer(props: Props) {
   });
   const [headerVisible, setHeaderVisible] = createSignal<boolean>(false);
   const [table, setTable] = createSignal();
+  const [showParent, setShowParent] = createSignal<boolean>(false);
 
   const [capabilities, setCapabilities] = createSignal<RFileCap[]>([]);
 
@@ -42,6 +44,22 @@ function RemoteExplorer(props: Props) {
   createEffect(() => {
     if (props.curRemote !== undefined) {
       setFiles([]);
+    }
+  })
+
+  createEffect(() => {
+    if (pwd().length > 0) {
+      setShowParent(true);
+    } else {
+      setShowParent(false);
+    }
+  })
+
+  createEffect(() => {
+    if (showParent()) {
+      const parentFile = clone(pwd()[pwd().length - 1]);
+      parentFile.setName("..");
+      setFiles((files) => [parentFile, ...files]);
     }
   })
 
@@ -88,14 +106,26 @@ function RemoteExplorer(props: Props) {
 
     changeDirectoryOnClick: () => {
       const file = files()[selFile()];
+
       if (props.curRemote !== undefined && file != null) {
+        const toParent: boolean = pwd().length > 0
+          && file.getId() == pwd()[pwd().length - 1].getId();
+
+        let newPwd: DriveFileMeta[];
+
+        if (toParent) {
+          newPwd = pwd().slice(0, pwd().length - 1);
+        } else {
+          newPwd = [...pwd(), file];
+        }
+
         getRequiredApi(props.curRemote)
           .then(api => {
-            return api.list(props.curRemote!, [...pwd(), file]);
+            return api.list(props.curRemote!, newPwd);
           })
           .then((r) => {
             setFiles(r);
-            setPwd([...pwd(), file]);
+            setPwd(newPwd);
           })
       }
       setCMVisible(false);
@@ -116,7 +146,6 @@ function RemoteExplorer(props: Props) {
         setCapabilities([RFileCap.CHANGE_DIRECTORY]);
       } else {
         setCapabilities([RFileCap.REMOVE, RFileCap.DOWNLOAD]);
-
       }
       return callback(file)(e)
     }
