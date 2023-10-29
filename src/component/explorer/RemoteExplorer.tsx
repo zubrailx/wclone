@@ -44,6 +44,7 @@ function RemoteExplorer(props: Props) {
   createEffect(() => {
     if (props.curRemote !== undefined) {
       setFiles([]);
+      setPwd([]);
     }
   })
 
