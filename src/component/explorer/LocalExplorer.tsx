@@ -7,11 +7,13 @@ import Explorer, { ExplorerFunctions, FILE_NOT_SELECTED } from "./Explorer.jsx";
 import { Table, TableCell, TableHeadCell, TableHeadRow, TableRow } from "./Table.jsx";
 import { DriveRemote } from "../../remote/base.js";
 import { useApiContext } from "./../DriveProvider.jsx";
+import { DriveFileMeta } from "../../api/base.js";
 
 type Props = {
   curRemote: DriveRemote | undefined,
   cypher: LocalFileEncryptor,
   files: EncryptableLocalFile[],
+  pwd: DriveFileMeta[],
   setFiles: Setter<EncryptableLocalFile[]>,
 }
 
@@ -95,7 +97,7 @@ function LocalExplorer(props: Props) {
     if (props.curRemote !== undefined) {
       getRequiredApi(props.curRemote)
         .then(api => {
-          return api.upload(props.curRemote!, props.files[selFile()])
+          return api.upload(props.curRemote!, props.pwd, props.files[selFile()])
         }).then((res) => {
           console.log(res);
         })

@@ -153,8 +153,9 @@ export class GDriveAPI implements DriveAPI {
       })
   };
 
-  public async upload(remote: GDriveRemote, file: EncryptableLocalFile) {
+  public async upload(remote: GDriveRemote, pwd: DriveFileMeta[], file: EncryptableLocalFile) {
     const meta: Meta = {}
+    const location = pwd.length == 0 ? 'root' : `${pwd[pwd.length - 1].getId()}`
     return this.initClient(remote)
       .then((_) => {
         return gapi.client.drive.files.create({
@@ -164,6 +165,7 @@ export class GDriveAPI implements DriveAPI {
             name: file.getName(),
             createdTime: file.getModifiedTime().toISOString(),
             fields: 'id,name,size,mimeType,createdTime',
+            parents: [location],
           }
         })
       })

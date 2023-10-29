@@ -16,6 +16,8 @@ function log(...msg: any) {
 type Props = {
   curRemote: DriveRemote | undefined,
   cypher: LocalFileEncryptor,
+  pwd: DriveFileMeta[],
+  setPwd: Setter<DriveFileMeta[]>,
   setLocal: Setter<EncryptableLocalFile[]>
 }
 
@@ -24,8 +26,6 @@ function RemoteExplorer(props: Props) {
 
   const [files, setFiles] = createSignal<DriveFileMeta[]>([]);
   const [selFile, setSelFile] = createSignal(FILE_NOT_SELECTED);
-
-  const [pwd, setPwd] = createSignal<DriveFileMeta[]>([], { equals: false });
 
   const [CMPosition, setCMPosition] = createSignal({ x: 0, y: 0 });
   const [CMVisible, setCMVisible] = createSignal<boolean>(false);
@@ -41,96 +41,90 @@ function RemoteExplorer(props: Props) {
   const [capabilities, setCapabilities] = createSignal<RFileCap[]>([]);
 
   // Files
-  createEffect(() => {
+  createEffect(() => { // on remote change
     if (props.curRemote !== undefined) {
       setFiles([]);
-      setPwd([]);
+      props.setPwd([]);
     }
   })
 
-  createEffect(() => {
-    if (pwd().length > 0) {
-      setShowParent(true);
-    } else {
-      setShowParent(false);
-    }
-  })
+  function hasParent() {
+    return props.pwd.length > 0;
+  }
 
-  createEffect(() => {
-    if (showParent()) {
-      const parentFile = clone(pwd()[pwd().length - 1]);
-      parentFile.setName("..");
-      setFiles((files) => [parentFile, ...files]);
-    }
-  })
+  function getParent() {
+    const parentFile = clone(props.pwd[props.pwd.length - 1]);
+    parentFile.setName("..");
+    return parentFile;
+  }
 
-  async function handleListClick() {
+  function listFilesOnClick() {
     if (props.curRemote !== undefined) {
       getRequiredApi(props.curRemote)
         .then(api => {
-          return api.list(props.curRemote!, pwd());
+          return api.list(props.curRemote!, props.pwd);
         })
         .then(res => {
-          setFiles(res);
+          if (hasParent()) {
+            setFiles([getParent(), ...res]); // process parent directory
+          } else {
+            setFiles(res);
+          }
         })
     }
   }
 
+  function downloadFileOnClick() {
+    const file = files()[selFile()];
+    if (props.curRemote !== undefined && file != null) {
+      getRequiredApi(props.curRemote)
+        .then(api => {
+          return api.download(props.curRemote!, file);
+        })
+        .then((r) => {
+          props.setLocal((files) => [...files, r])
+          console.log(r);
+        })
+    }
+    setCMVisible(false);
+  }
+
+  function removeFileOnClick() {
+    const file = files()[selFile()];
+    if (props.curRemote !== undefined && file != null) {
+      getRequiredApi(props.curRemote)
+        .then(api => {
+          api.remove(props.curRemote!, file);
+        }).then((r) => {
+          console.log(r);
+        })
+    }
+    setCMVisible(false);
+  }
+
+  function changeDirectoryOnClick() {
+    const file = files()[selFile()];
+
+    if (props.curRemote !== undefined && file != null) {
+      const toParent: boolean = props.pwd.length > 0
+        && file.getId() == props.pwd[props.pwd.length - 1].getId();
+
+      let newPwd: DriveFileMeta[];
+      if (toParent) {
+        newPwd = props.pwd.slice(0, props.pwd.length - 1);
+      } else {
+        newPwd = [...props.pwd, file];
+      }
+      props.setPwd(newPwd);
+      listFilesOnClick();
+    }
+    setCMVisible(false);
+  }
+
   const fn = {
-    downloadFileOnClick: () => {
-      const file = files()[selFile()];
-      if (props.curRemote !== undefined && file != null) {
-        getRequiredApi(props.curRemote)
-          .then(api => {
-            return api.download(props.curRemote!, file);
-          })
-          .then((r) => {
-            props.setLocal((files) => [...files, r])
-            console.log(r);
-          })
-      }
-      setCMVisible(false);
-    },
-
-    removeFileOnClick: () => {
-      const file = files()[selFile()];
-      if (props.curRemote !== undefined && file != null) {
-        getRequiredApi(props.curRemote)
-          .then(api => {
-            api.remove(props.curRemote!, file);
-          }).then((r) => {
-            console.log(r);
-          })
-      }
-      setCMVisible(false);
-    },
-
-    changeDirectoryOnClick: () => {
-      const file = files()[selFile()];
-
-      if (props.curRemote !== undefined && file != null) {
-        const toParent: boolean = pwd().length > 0
-          && file.getId() == pwd()[pwd().length - 1].getId();
-
-        let newPwd: DriveFileMeta[];
-
-        if (toParent) {
-          newPwd = pwd().slice(0, pwd().length - 1);
-        } else {
-          newPwd = [...pwd(), file];
-        }
-
-        getRequiredApi(props.curRemote)
-          .then(api => {
-            return api.list(props.curRemote!, newPwd);
-          })
-          .then((r) => {
-            setFiles(r);
-            setPwd(newPwd);
-          })
-      }
-      setCMVisible(false);
-    },
+    downloadFileOnClick: downloadFileOnClick,
+    removeFileOnClick: removeFileOnClick,
+    changeDirectoryOnClick: changeDirectoryOnClick
   }
 
   function getPwdString(pwd: DriveFileMeta[]) {
@@ -161,8 +155,8 @@ function RemoteExplorer(props: Props) {
       <div class='remotefile'>
         <h3>Remote explorer</h3>
         <div>
-          <button onClick={handleListClick}>List remote files</button>
-          <span>Working directory: {getPwdString(pwd())}</span>
+          <button onClick={listFilesOnClick}>List remote files</button>
+          <span>Working directory: {getPwdString(props.pwd)}</span>
         </div>
         <Table setRef={setTable}>
           <TableHeadRow visible={headerVisible()}>

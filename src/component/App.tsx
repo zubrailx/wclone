@@ -12,12 +12,14 @@ import RemoteExplorer from './explorer/RemoteExplorer.jsx';
 import SelectCypherSection from './cypher/SelectCypherSection.jsx';
 import { LocalFileEncryptor } from '../cypher/base.js';
 import { EncryptableLocalFile } from '../localfile.js';
+import { DriveFileMeta } from '../api/base.js';
 
 function App() {
   const [remotes, setRemotes] = createStore<DriveRemote[]>(storageGetRemotes());
   const [curRemote, setCurRemote] = createSignal<DriveRemote>();
   const [cypher, setCypher] = createSignal<LocalFileEncryptor>({} as LocalFileEncryptor);
   const [files, setFiles] = createSignal<EncryptableLocalFile[]>([], {equals: false});
+  const [pwd, setPwd] = createSignal<DriveFileMeta[]>([], {equals: false});
 
   createEffect(() => {
     if (remotes) {
@@ -31,8 +33,8 @@ function App() {
         <AddRemoteSection setRemotes={setRemotes} />
         <SelectRemoteSection remotes={remotes} setRemotes={setRemotes} setCurRemote={setCurRemote} />
         <SelectCypherSection setCypher={setCypher} />
-        <RemoteExplorer curRemote={curRemote()} cypher={cypher()} setLocal={setFiles} />
-        <LocalExplorer curRemote={curRemote()} cypher={cypher()} files={files()} setFiles={setFiles} />
+        <RemoteExplorer curRemote={curRemote()} cypher={cypher()} setLocal={setFiles} pwd={pwd()} setPwd={setPwd}/>
+        <LocalExplorer curRemote={curRemote()} cypher={cypher()} files={files()} setFiles={setFiles} pwd={pwd()}/>
       </ApiProvider>
     </>
   )
