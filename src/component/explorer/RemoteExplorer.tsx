@@ -48,7 +48,7 @@ function RemoteExplorer(props: Props) {
     if (props.curRemote !== undefined) {
       getRequiredApi(props.curRemote)
         .then(api => {
-          return api.ls(props.curRemote!, 10, query())
+          return api.list(props.curRemote!, 10, query())
         })
         .then(res => {
           setFiles(res);

@@ -9,9 +9,11 @@ export interface DriveFileMeta {
 };
 
 export interface DriveOperations {
-  ls(remote: DriveRemote, pageSize: number, query: string): Promise<DriveFileMeta[]>;
+  list(remote: DriveRemote, pageSize: number, query: string): Promise<DriveFileMeta[]>;
   upload(remote: DriveRemote, file: EncryptableLocalFile): Promise<DriveFileMeta>;
-  // get(remote: DriveRemote, file: DriveFileMeta): Promise<EncryptableLocalFile>;
+  download(remote: DriveRemote, file: DriveFileMeta): Promise<EncryptableLocalFile>;
+  cd(remote: DriveRemote, file: DriveFileMeta): Promise<DriveFileMeta[]>;
+  remove(remote: DriveRemote, file: DriveFileMeta): Promise<DriveFileMeta[]>;
 };
 
 /** singleton object, used for accessing API */

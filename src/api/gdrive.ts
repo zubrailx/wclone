@@ -109,7 +109,7 @@ export class GDriveAPI implements DriveAPI {
     });
   }
 
-  public async ls(remote: GDriveRemote, pageSize: number, query: string): Promise<GDriveFileMeta[]> {
+  public async list(remote: GDriveRemote, pageSize: number, query: string): Promise<GDriveFileMeta[]> {
     return this.initClient(remote)
       .then((_) => {
         return gapi.client.drive.files.list({
@@ -175,4 +175,17 @@ export class GDriveAPI implements DriveAPI {
           meta.id, meta.name, meta.size, meta.mimeType, meta.createdTime);
       });
   }
+
+  public async download(remote: GDriveRemote, file: GDriveFileMeta): Promise<EncryptableLocalFile> {
+
+  }
+
+  public async cd(remote: GDriveRemote, file: GDriveFileMeta): Promise<GDriveFileMeta[]> {
+
+  }
+
+  public async remove(remote: GDriveRemote, file: GDriveFileMeta): Promise<GDriveFileMeta[]> {
+
+  }
+
 }
