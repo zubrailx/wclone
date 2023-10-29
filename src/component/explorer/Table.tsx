@@ -16,7 +16,7 @@ function TableRow(props: { class?: string, children: any, style?: any, onContext
 
 function TableCell(props: { class?: string, children: any }) {
   return (
-    <div class='cell {props.class}'>
+    <div class={"cell" + (props.class == null ? "" : " " + props.class)}>
       {...props.children}
     </div>
   )

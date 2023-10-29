@@ -1,6 +1,7 @@
 import { createEffect } from "solid-js";
+import { max, min } from "../../utils.js";
 
-function ContextMenu(props: { position: any, visible: boolean, root: any, children?: any }) {
+function ContextMenu(props: { position: any, visible: boolean, root: HTMLElement, children?: any }) {
 
   createEffect(() => {
     if (props.visible) {

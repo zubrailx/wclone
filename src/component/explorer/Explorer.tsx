@@ -61,7 +61,10 @@ function Explorer(props: Props) {
   // Context Menu
   function onRowClick(file: any) {
     return function(e: MouseEvent) {
-      props.CMSetPosition({ x: e.clientX, y: e.clientY });
+      // TODO: reformat to position context menu properly
+      let x = e.pageX;
+      let y = e.pageY;
+      props.CMSetPosition({ x: x, y: y });
       if (props.filesSelected == FILE_NOT_SELECTED) {
         window.addEventListener('contextmenu', unselectForContextMenu);
         window.addEventListener('click', unselectForClick);

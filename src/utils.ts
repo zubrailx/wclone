@@ -104,3 +104,17 @@ export function until(cond: () => boolean) {
 export function clone<T>(obj: T): T {
   return Object.assign(Object.create(Object.getPrototypeOf(obj)), obj)
 }
+
+export function min<T>(left: T, right: T): T {
+  if (left > right) {
+    return right;
+  }
+  return left;
+}
+
+export function max<T>(left: T, right: T): T {
+  if (left < right) {
+    return right;
+  }
+  return left;
+}
