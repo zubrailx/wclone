@@ -145,7 +145,6 @@ export class GDriveAPI implements DriveAPI {
         });
       })
       .then((r) => {
-        console.log(r.result.files);
         return r.result.files.map(
           (file: any) => new GDriveFileMeta(
             file.id, file.name, file.size, file.mimeType, new Date(file.createdTime))

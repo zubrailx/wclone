@@ -62,8 +62,7 @@ export function bytesToBase64(bytes: Uint8Array): string {
 }
 
 export function bytesArrToBase64(bytesArr: Uint8Array[]): string {
-  console.log(bytesArr);
-  const binString = bytesArr.map((bytes) => String.fromCodePoint(...bytes)).join('')
+  const binString = bytesArr.map((bytes) => bytesToBase64(bytes)).join('')
   return btoa(binString);
 }
 

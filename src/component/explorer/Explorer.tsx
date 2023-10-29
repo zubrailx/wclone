@@ -79,7 +79,6 @@ function Explorer(props: Props) {
       window.removeEventListener('contextmenu', unselectForContextMenu);
       window.removeEventListener('click', unselectForClick);
     }
-    props.log('selected file =', props.filesSelected);
   })
 
   function unselectForClick(ev: MouseEvent) {

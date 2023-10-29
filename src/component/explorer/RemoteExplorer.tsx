@@ -65,6 +65,7 @@ function RemoteExplorer(props: Props) {
           return api.list(props.curRemote!, props.pwd);
         })
         .then(res => {
+          console.log(res);
           if (hasParent()) {
             setFiles([getParent(), ...res]); // process parent directory
           } else {

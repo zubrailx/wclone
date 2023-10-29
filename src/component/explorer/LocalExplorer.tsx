@@ -68,7 +68,6 @@ function LocalExplorer(props: Props) {
 
   function removeFileOnClick() {
     props.setFiles((files) => {
-      console.log("removed file with idx ", selFile())
       files.splice(selFile(), 1);
       return files
     });
