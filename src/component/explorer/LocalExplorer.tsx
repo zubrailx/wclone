@@ -100,6 +100,8 @@ function LocalExplorer(props: Props) {
           return api.upload(props.curRemote!, props.pwd, file);
         }).then((res) => {
           console.log(res);
+        }).catch((e) => {
+          alert(JSON.stringify(e));
         })
     }
     setCMVisible(false);

@@ -70,6 +70,8 @@ function RemoteExplorer(props: Props) {
           } else {
             setFiles(res);
           }
+        }).catch((e) => {
+          alert(JSON.stringify(e));
         })
     }
   }
@@ -84,6 +86,8 @@ function RemoteExplorer(props: Props) {
         .then((r) => {
           props.setLocal((files) => [...files, r])
           console.log(r);
+        }).catch((e) => {
+          alert(JSON.stringify(e));
         })
     }
     setCMVisible(false);
@@ -97,6 +101,8 @@ function RemoteExplorer(props: Props) {
           api.remove(props.curRemote!, file);
         }).then((r) => {
           console.log(r);
+        }).catch((e) => {
+          alert(JSON.stringify(e));
         })
     }
     setCMVisible(false);
