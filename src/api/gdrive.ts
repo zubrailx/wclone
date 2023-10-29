@@ -188,4 +188,9 @@ export class GDriveAPI implements DriveAPI {
 
   }
 
+  // files from root
+  pwd(remote: GDriveRemote, file: GDriveFileMeta): Promise<GDriveFileMeta[]> {
+
+  }
+
 }

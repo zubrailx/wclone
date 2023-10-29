@@ -14,6 +14,7 @@ export interface DriveOperations {
   download(remote: DriveRemote, file: DriveFileMeta): Promise<EncryptableLocalFile>;
   cd(remote: DriveRemote, file: DriveFileMeta): Promise<DriveFileMeta[]>;
   remove(remote: DriveRemote, file: DriveFileMeta): Promise<DriveFileMeta[]>;
+  pwd(remote: DriveRemote, file: DriveFileMeta): Promise<DriveFileMeta[]>;
 };
 
 /** singleton object, used for accessing API */

@@ -23,6 +23,7 @@ function RemoteExplorer(props: Props) {
   const [selFile, setSelFile] = createSignal(FILE_NOT_SELECTED);
 
   const [query, changeQuery] = createSignal("parents in 'root'");
+  const [pwd, setPwd] = createSignal("/");
 
   const [CMPosition, setCMPosition] = createSignal({ x: 0, y: 0 });
   const [CMVisible, setCMVisible] = createSignal<boolean>(false);
@@ -70,7 +71,10 @@ function RemoteExplorer(props: Props) {
 
       <div class='remotefile'>
         <h3>Remote explorer</h3>
-        <button onClick={handleListClick}>List remote files</button>
+        <div>
+          <button onClick={handleListClick}>List remote files</button>
+          <span>Working directory: {pwd()}</span>
+        </div>
         <Table ref={table}>
           <TableHeadRow visible={headerVisible()}>
             <TableHeadCell>Name</TableHeadCell>
