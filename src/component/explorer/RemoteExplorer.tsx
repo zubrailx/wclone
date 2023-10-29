@@ -72,8 +72,34 @@ function RemoteExplorer(props: Props) {
       }
       setCMVisible(false);
     },
-    removeFileOnClick: () => { },
-    changeDirectoryOnClick: () => { },
+
+    removeFileOnClick: () => {
+      const file = files()[selFile()];
+      if (props.curRemote !== undefined && file != null) {
+        getRequiredApi(props.curRemote)
+          .then(api => {
+            api.remove(props.curRemote!, file);
+          }).then((r) => {
+            console.log(r);
+          })
+      }
+      setCMVisible(false);
+    },
+
+    changeDirectoryOnClick: () => {
+      const file = files()[selFile()];
+      if (props.curRemote !== undefined && file != null) {
+        getRequiredApi(props.curRemote)
+          .then(api => {
+            return api.list(props.curRemote!, [...pwd(), file]);
+          })
+          .then((r) => {
+            setFiles(r);
+            setPwd([...pwd(), file]);
+          })
+      }
+      setCMVisible(false);
+    },
   }
 
   function getPwdString(pwd: DriveFileMeta[]) {

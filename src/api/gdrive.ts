@@ -126,7 +126,7 @@ export class GDriveAPI implements DriveAPI {
   public async list(remote: GDriveRemote, pwd: GDriveFileMeta[]): Promise<GDriveFileMeta[]> {
     let query = pwd.length == 0
       ? "(parents in 'root')"
-      : `(parents in ${pwd[pwd.length - 1].id})`;
+      : `(parents in '${pwd[pwd.length - 1].id}')`;
     query += " and (trashed = false)";
 
     return this.initClient(remote)
@@ -217,17 +217,15 @@ export class GDriveAPI implements DriveAPI {
       })
   }
 
-  public async cd(remote: GDriveRemote, file: GDriveFileMeta): Promise<GDriveFileMeta[]> {
-
-  }
-
-  public async remove(remote: GDriveRemote, file: GDriveFileMeta): Promise<GDriveFileMeta[]> {
-
-  }
-
-  // files from root
-  pwd(remote: GDriveRemote, file: GDriveFileMeta): Promise<GDriveFileMeta[]> {
-
+  public async remove(remote: GDriveRemote, file: GDriveFileMeta): Promise<any> {
+    return this.initClient(remote)
+      .then((_) => {
+        return gapi.client.drive.files.delete({
+          fileId: file.id
+        })
+      }).then((res) => {
+        return res;
+      })
   }
 
 }
