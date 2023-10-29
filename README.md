@@ -34,3 +34,4 @@ Learn more about deploying your application with the [documentations](https://vi
 - [x] Add selection for Crypto algorithm. Example: create popup window with algorithms to select with relevant parameters.
 - [x] Use localStorage for remotes and algorithms
 - [ ] Try using streaming algorithm without loading file into the browser
+- [x] Fix some bugs that are relevant to coordinate positioning. Because of it context menu sometimes doesn't open.

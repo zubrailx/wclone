@@ -1,6 +1,14 @@
-function Table(props: { ref?: any, children: any }) {
+import { Setter, onMount } from "solid-js"
+
+function Table(props: { setRef: Setter<any>, children: any }) {
+  let ref: any;
+
+  onMount(() => {
+    props.setRef(ref);
+  })
+
   return (
-    <div ref={props.ref} class='table'>
+    <div ref={ref} class='table'>
       {...props.children}
     </div>
   )

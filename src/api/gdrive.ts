@@ -1,10 +1,19 @@
-import { EncryptableLocalFile } from "../localfile.js";
+import { Algorithm } from "../cypher/base.js";
+import { EncryptableLocalFile, LocalFile } from "../localfile.js";
 import { GDriveRemote } from "../remote/gdrive.js";
-import { bytesArrToBase64, loadScript, until } from "../utils.js";
+import { loadScript, until } from "../utils.js";
 import { DriveFileMeta as DriveFileMeta, DriveAPI } from "./base.js";
 
 declare var gapi: any;
 declare var google: any;
+
+type Meta = {
+  id?: string,
+  name?: string,
+  size?: number,
+  mimeType?: string,
+  createdTime?: Date
+};
 
 class GDriveFileMeta implements DriveFileMeta {
   id: string;
@@ -35,6 +44,10 @@ class GDriveFileMeta implements DriveFileMeta {
 
   getCreatedTime(): Date {
     return this.createdTime;
+  }
+
+  isFolder(): boolean {
+    return this.mimeType === "application/vnd.google-apps.folder";
   }
 };
 
@@ -102,6 +115,7 @@ export class GDriveAPI implements DriveAPI {
     return gapi.client.init({
       apiKey: remote.getApiKey(),
       discoveryDocs: [DISCOVERY_DOC],
+      encoding: null,
     }).then(() => {
       gapi.client.setToken({
         access_token: remote.getAccessToken()
@@ -109,16 +123,21 @@ export class GDriveAPI implements DriveAPI {
     });
   }
 
-  public async list(remote: GDriveRemote, pageSize: number, query: string): Promise<GDriveFileMeta[]> {
+  public async list(remote: GDriveRemote, pwd: GDriveFileMeta[]): Promise<GDriveFileMeta[]> {
+    let query = pwd.length == 0
+      ? "(parents in 'root')"
+      : `(parents in ${pwd[pwd.length - 1].id})`;
+    query += " and (trashed = false)";
+
     return this.initClient(remote)
       .then((_) => {
         return gapi.client.drive.files.list({
-          pageSize: pageSize,
           q: query,
           fields: 'files(id, name, size, mimeType, createdTime)',
         });
       })
       .then((r) => {
+        console.log(r.result.files);
         return r.result.files.map(
           (file: any) => new GDriveFileMeta(
             file.id, file.name, file.size, file.mimeType, new Date(file.createdTime))
@@ -127,14 +146,7 @@ export class GDriveAPI implements DriveAPI {
   };
 
   public async upload(remote: GDriveRemote, file: EncryptableLocalFile) {
-    type Meta = {
-      id?: string,
-      name?: string,
-      size?: number,
-      mimeType?: string,
-      createdTime?: Date
-    };
-
+    const meta: Meta = {}
     return this.initClient(remote)
       .then((_) => {
         return gapi.client.drive.files.create({
@@ -149,12 +161,11 @@ export class GDriveAPI implements DriveAPI {
       })
       .then(async (res: any) => {
         const data = new Blob(file.getContent(), { type: file.getMimeType() });
-        const meta: Meta = {};
         meta.id = res.result.id;
         meta.name = res.result.name;
         meta.size = Number(res.result.size);
         meta.mimeType = res.result.mimeType;
-        await fetch(
+        return await fetch(
           `https://www.googleapis.com/upload/drive/v3/files/${res.result.id}`, {
           method: 'PATCH',
           headers: new Headers({
@@ -163,21 +174,47 @@ export class GDriveAPI implements DriveAPI {
           }),
           body: data
         });
-        return meta;
       })
-      .then((meta: Meta) => {
+      .then((_) => {
         meta.size = file.getSize();
         meta.createdTime = file.getModifiedTime();
-        return meta;
-      })
-      .then((meta: Meta) => {
         return new GDriveFileMeta(
           meta.id, meta.name, meta.size, meta.mimeType, meta.createdTime);
-      });
+      })
   }
 
   public async download(remote: GDriveRemote, file: GDriveFileMeta): Promise<EncryptableLocalFile> {
+    const meta: Meta = {};
 
+    return this.initClient(remote)
+      .then((_) => {
+        return gapi.client.drive.files.get({
+          fileId: file.id,
+          fields: 'id,name,size,mimeType,createdTime',
+        })
+      })
+      .then(async (r) => {
+        meta.id = r.result.id;
+        meta.name = r.result.name;
+        meta.size = r.result.size;
+        meta.mimeType = r.result.mimeType;
+        meta.createdTime = new Date(r.result.createdTime);
+
+        return await fetch(
+          `https://www.googleapis.com/drive/v3/files/${meta.id}?alt=media`, {
+          method: 'GET',
+          headers: new Headers({
+            'Authorization': `Bearer ${gapi.client.getToken().access_token}`,
+            'Content-Type': meta.mimeType!,
+          })
+        });
+      }).then((res) => {
+        return res.arrayBuffer();
+      })
+      .then((res) => {
+        return new EncryptableLocalFile(
+          new LocalFile(meta.name!, meta.size!, meta.mimeType!, meta.createdTime!, [new Uint8Array(res)]), Algorithm.NONE_OR_UNK);
+      })
   }
 
   public async cd(remote: GDriveRemote, file: GDriveFileMeta): Promise<GDriveFileMeta[]> {

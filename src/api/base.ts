@@ -6,10 +6,11 @@ export interface DriveFileMeta {
   getSize(): number;
   getMimeType(): string;
   getCreatedTime(): Date;
+  isFolder(): boolean;
 };
 
 export interface DriveOperations {
-  list(remote: DriveRemote, pageSize: number, query: string): Promise<DriveFileMeta[]>;
+  list(remote: DriveRemote, pwd: DriveFileMeta[]): Promise<DriveFileMeta[]>;
   upload(remote: DriveRemote, file: EncryptableLocalFile): Promise<DriveFileMeta>;
   download(remote: DriveRemote, file: DriveFileMeta): Promise<EncryptableLocalFile>;
   cd(remote: DriveRemote, file: DriveFileMeta): Promise<DriveFileMeta[]>;

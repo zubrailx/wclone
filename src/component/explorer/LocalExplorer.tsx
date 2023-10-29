@@ -1,4 +1,4 @@
-import { createSignal } from "solid-js";
+import { Setter, createSignal } from "solid-js";
 import { For } from "solid-js";
 import { EncryptableLocalFile, fromFile } from "../../localfile.js";
 import LocalContextMenu, { LFileCap } from "./LocalContextMenu.jsx";
@@ -11,6 +11,8 @@ import { useApiContext } from "./../DriveProvider.jsx";
 type Props = {
   curRemote: DriveRemote | undefined,
   cypher: LocalFileEncryptor,
+  files: EncryptableLocalFile[],
+  setFiles: Setter<EncryptableLocalFile[]>,
 }
 
 function log(...msg: any) {
@@ -20,7 +22,6 @@ function log(...msg: any) {
 function LocalExplorer(props: Props) {
   const [_, { getRequiredApi }] = useApiContext();
 
-  const [files, setFiles] = createSignal<EncryptableLocalFile[]>([], { equals: false });
   const [selFile, setSelFile] = createSignal(FILE_NOT_SELECTED);
 
   const [CMVisible, setCMVisible] = createSignal<boolean>(false);
@@ -31,27 +32,27 @@ function LocalExplorer(props: Props) {
     onRowClick: Function,
   });
   const [headerVisible, setHeaderVisible] = createSignal<boolean>(false);
+  const [table, setTable] = createSignal();
 
   const [capabilities, setCapabilities] = createSignal<LFileCap[]>([
     LFileCap.DECRYPT, LFileCap.ENCRYPT, LFileCap.REMOVE, LFileCap.DOWNLOAD, LFileCap.UPLOAD
   ]);
 
   let inputFile: HTMLInputElement | undefined;
-  let table: HTMLDivElement | undefined;
 
   // Files
   async function inputFileOnChange(event: any) {
     const fileList: FileList = event.target.files;
     for (const file of fileList) {
       const newFile = new EncryptableLocalFile(await fromFile(file), Algorithm.NONE_OR_UNK);
-      setFiles((files) => {
+      props.setFiles((files) => {
         return [...files, newFile]
       });
     }
   }
 
   function downloadFileOnClick() {
-    const localFile = files()[selFile()];
+    const localFile = props.files[selFile()];
     const downloadLink = document.createElement("a");
     downloadLink.href = URL.createObjectURL(localFile.toFile());
     downloadLink.setAttribute('download', '');
@@ -64,7 +65,7 @@ function LocalExplorer(props: Props) {
   }
 
   function removeFileOnClick() {
-    setFiles((files) => {
+    props.setFiles((files) => {
       console.log("removed file with idx ", selFile())
       files.splice(selFile(), 1);
       return files
@@ -73,18 +74,18 @@ function LocalExplorer(props: Props) {
 
   // create encrypt window
   function encryptFileOnClick() {
-    const file = files()[selFile()];
+    const file = props.files[selFile()];
     const encryptedFile = props.cypher.encryptFile(file);
-    setFiles((files) => {
+    props.setFiles((files) => {
       files[selFile()] = encryptedFile;
       return files;
     })
   }
 
   function decryptFileOnClick() {
-    const file = files()[selFile()];
+    const file = props.files[selFile()];
     const decrFile = props.cypher.decryptFile(file);
-    setFiles((files) => {
+    props.setFiles((files) => {
       files[selFile()] = decrFile;
       return files;
     })
@@ -94,7 +95,7 @@ function LocalExplorer(props: Props) {
     if (props.curRemote !== undefined) {
       getRequiredApi(props.curRemote)
         .then(api => {
-          return api.upload(props.curRemote!, files()[selFile()])
+          return api.upload(props.curRemote!, props.files[selFile()])
         }).then((res) => {
           console.log(res);
         })
@@ -111,15 +112,15 @@ function LocalExplorer(props: Props) {
   }
 
   return (
-    <Explorer filesList={files()} filesSelected={selFile()} filesSetSelected={setSelFile}
-      table={table} tableFunctions={setExplorerFunctions} tableSetHeaderVisible={setHeaderVisible}
+    <Explorer filesList={props.files} filesSelected={selFile()} filesSetSelected={setSelFile}
+      table={table()} tableFunctions={setExplorerFunctions} tableSetHeaderVisible={setHeaderVisible}
       CMVisible={CMVisible()} CMSetVisible={setCMVisible} CMPosition={CMPosition()}
       CMSetPosition={setCMPosition} CMElement={contextMenu()} log={log}>
 
       <div class='localfile'>
         <h3>Local explorer</h3>
         <input type="file" ref={inputFile} onChange={inputFileOnChange} value="Upload" multiple />
-        <Table ref={table}>
+        <Table setRef={setTable}>
           <TableHeadRow visible={headerVisible()}>
             <TableHeadCell>Algorithm</TableHeadCell>
             <TableHeadCell>Name</TableHeadCell>
@@ -127,7 +128,7 @@ function LocalExplorer(props: Props) {
             <TableHeadCell>Modified Time</TableHeadCell>
             <TableHeadCell>Mime Type</TableHeadCell>
           </TableHeadRow>
-          <For each={files()}>{(file, i) =>
+          <For each={props.files}>{(file, _) =>
             <TableRow onContextMenu={explorerFunctions().onRowClick(file)}>
               <TableCell>{Algorithm[file.getEncryptAlgorithm()]}</TableCell>
               <TableCell>{file.getName()}</TableCell>
