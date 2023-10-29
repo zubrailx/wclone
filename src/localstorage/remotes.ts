@@ -1,14 +1,13 @@
 import { DriveRemote } from "../remote/base.js";
 import { GDriveRemote } from "../remote/gdrive.js";
-
-const STORAGE_REMOTES = "remotes";
+import { STORAGE_REMOTES_KEY } from "./general.js";
 
 enum DriveRemoteEnum {
   GDRIVE = 1,
 }
 
 export function storageGetRemotes(): DriveRemote[] {
-  const item = window.localStorage.getItem(STORAGE_REMOTES)
+  const item = window.localStorage.getItem(STORAGE_REMOTES_KEY)
   if (item === null) {
     return [];
   }
@@ -30,7 +29,7 @@ export function storageGetRemotes(): DriveRemote[] {
 }
 
 export function storageSetRemotes(remotes: DriveRemote[]) {
-  window.localStorage.setItem(STORAGE_REMOTES, JSON.stringify(remotes.map(remote => {
+  window.localStorage.setItem(STORAGE_REMOTES_KEY, JSON.stringify(remotes.map(remote => {
     const obj: any = remote;
     if (remote instanceof GDriveRemote) {
       obj["drive_type"] = DriveRemoteEnum.GDRIVE;

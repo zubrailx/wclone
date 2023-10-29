@@ -26,21 +26,23 @@ type SelectEvent = Event & {
   target: HTMLSelectElement;
 };
 
-function AddRemoteSection(props: Props) {
+function setDriveArr() {
   const driveArr: DriveElem[] = []
-
   {
     const [val, change] = createSignal<CreateRemoteFN>();
     driveArr.push([val, change, new DriveEntry(
       "gdrive", "Google Drive API", <GDriveAdd setCreateRemote={change} />)]);
   }
+  return driveArr;
+}
 
+function AddRemoteSection(props: Props) {
+  const driveArr: DriveElem[] = setDriveArr();
+  const [drive, setDrive] = createSignal<DriveElem>(driveArr[0]);
 
   function findDriveByValue(value: string) {
     driveArr.find((e) => e[2].value === value);
   }
-
-  const [drive, setDrive] = createSignal<DriveElem>(driveArr[0]);
 
   function displaySelectedRemote(e: SelectEvent) {
     const entry = findDriveByValue(e.target.value);

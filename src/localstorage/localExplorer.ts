@@ -1,5 +1,4 @@
-const STORAGE_SECRET_DEFAULT = "secret"
-const STORAGE_SECRET_KEY = "secret_key"
+import { STORAGE_SECRET_DEFAULT, STORAGE_SECRET_KEY } from "./general.js";
 
 function storageGetSecretKey() {
   let secretKey = window.localStorage.getItem(STORAGE_SECRET_KEY)

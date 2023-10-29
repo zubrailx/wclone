@@ -3,6 +3,7 @@ import { EncryptableLocalFile, LocalFile } from "../localfile.js";
 export enum Algorithm {
   NONE_OR_UNK = 0,
   AES = 1,
+  NONE = 2,
 }
 
 export abstract class Encryptor {

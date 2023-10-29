@@ -5,17 +5,10 @@ import CryptoJS from 'crypto-js';
 
 class AESFileEncryptor extends LocalFileEncryptor {
   secretKey: string
-  options: any
 
   constructor(secretKey: string) {
     super(Algorithm.AES);
     this.secretKey = secretKey;
-    this.options = {
-      mode: CryptoJS.mode.ECB,
-      padding: CryptoJS.pad.Pkcs7,
-      iv: CryptoJS.enc.Hex.parse("18191a1b1c1d1e1f"),
-      salt: CryptoJS.enc.Hex.parse("1011121314151617"),
-    };
   }
 
   encrypt(dataArr: Uint8Array[]): Uint8Array[] {
@@ -36,14 +29,14 @@ class AESFileEncryptor extends LocalFileEncryptor {
 
   private encryptOne(data: Uint8Array): Uint8Array {
     const dataWordArr = Uint8ArrayToCryptJsWordArray(data);
-    const result = CryptoJS.AES.encrypt(dataWordArr, this.secretKey, this.options).toString();
+    const result = CryptoJS.AES.encrypt(dataWordArr, this.secretKey).toString();
     const u8Arr = base64ToBytes(result);
     return u8Arr;
   }
 
   private decryptOne(data: Uint8Array): Uint8Array {
     const dataStr = bytesToBase64(data);
-    const result = CryptoJS.AES.decrypt(dataStr, this.secretKey, this.options);
+    const result = CryptoJS.AES.decrypt(dataStr, this.secretKey);
     const u8Arr = CryptJsWordArrayToUint8Array(result);
     return u8Arr;
   }
