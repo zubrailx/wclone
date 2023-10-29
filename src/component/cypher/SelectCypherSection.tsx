@@ -3,7 +3,7 @@ import { LocalFileEncryptor } from "../../cypher/base.js"
 import { AESFileEncryptor } from "../../cypher/aes.js";
 import AESConfig from "./AESConfig.jsx";
 import { NoneFileEncryptor } from "../../cypher/none.js";
-import { storageSetCyphersConfigured } from "../../localstorage/cypher.js";
+import { storageGetCypherConfigured, storageSetCyphersConfigured } from "../../localstorage/cypher.js";
 
 type Props = {
   setCypher: Setter<LocalFileEncryptor>
@@ -33,7 +33,7 @@ function setCyphers(): CypherElem[] {
   ]
 
   return cypherEncrytors.map((encryptor) => {
-    const [val, change] = createSignal(encryptor[0]);
+    const [val, change] = createSignal(storageGetCypherConfigured(encryptor[0]));
     return [val, change,
       new CypherEntry(encryptor[1], encryptor[2])]
   });

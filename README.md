@@ -30,6 +30,7 @@ Learn more about deploying your application with the [documentations](https://vi
 ## TODO
 
 - [ ] Create wrapper on content to store information about used algorithm (or store it in content)
-- [ ] Add selection for API backend. Example: create menu list where to select API and another page could be rendered.
-- [ ] Add selection for Crypto algorithm. Example: create popup window with algorithms to select with relevant parameters.
-- [ ] Use localStorage for 
+- [x] Add selection for API backend. Example: create menu list where to select API and another page could be rendered.
+- [x] Add selection for Crypto algorithm. Example: create popup window with algorithms to select with relevant parameters.
+- [x] Use localStorage for remotes and algorithms
+- [ ] Try using streaming algorithm without loading file into the browser
