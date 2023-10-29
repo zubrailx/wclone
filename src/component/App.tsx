@@ -7,8 +7,8 @@ import { ApiProvider } from './DriveProvider.jsx';
 import { createStore } from 'solid-js/store';
 import { createEffect, createSignal } from 'solid-js';
 import { storageGetRemotes, storageSetRemotes } from '../localstorage/remotes.js';
-import LocalExplorer from './LocalExplorer.jsx';
-import RemoteExplorer from './RemoteExplorer.jsx';
+import LocalExplorer from './explorer/LocalExplorer.jsx';
+import RemoteExplorer from './explorer/RemoteExplorer.jsx';
 import SelectCypherSection from './cypher/SelectCypherSection.jsx';
 
 function App() {

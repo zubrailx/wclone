@@ -1,14 +1,14 @@
 import { createSignal } from "solid-js";
 import { For } from "solid-js";
-import { EncryptableLocalFile, fromFile } from "../localfile.js";
+import { EncryptableLocalFile, fromFile } from "../../localfile.js";
 import LocalContextMenu, { LFileCap } from "./LocalContextMenu.jsx";
-import { Algorithm } from "../cypher/base.js";
+import { Algorithm } from "../../cypher/base.js";
 import Explorer, { ExplorerFunctions, FILE_NOT_SELECTED } from "./Explorer.jsx";
 import { Table, TableCell, TableHeadCell, TableHeadRow, TableRow } from "./Table.jsx";
-import { AESFileEncryptor } from "../cypher/aes.js";
-import { storageGetSecretKey } from "../localstorage/localExplorer.js";
-import { DriveRemote } from "../remote/base.js";
-import { useApiContext } from "./DriveProvider.jsx";
+import { AESFileEncryptor } from "../../cypher/aes.js";
+import { storageGetSecretKey } from "../../localstorage/localExplorer.js";
+import { DriveRemote } from "../../remote/base.js";
+import { useApiContext } from "./../DriveProvider.jsx";
 
 type Props = {
   curRemote: DriveRemote | undefined,

@@ -1,10 +1,10 @@
 import { For, createEffect, createSignal } from "solid-js";
-import { DriveFileMeta } from "../api/base.js";
-import { useApiContext } from "./DriveProvider.jsx";
+import { DriveFileMeta } from "../../api/base.js";
+import { useApiContext } from "./../DriveProvider.jsx";
 import RemoteContextMenu, { RFileCap } from "./RemoteContextMenu.jsx";
 import Explorer, { ExplorerFunctions, FILE_NOT_SELECTED } from "./Explorer.jsx";
 import { Table, TableCell, TableHeadCell, TableHeadRow, TableRow } from "./Table.jsx";
-import { DriveRemote } from "../remote/base.js";
+import { DriveRemote } from "../../remote/base.js";
 
 function log(...msg: any) {
   return console.log('[RemoteExplorer]:', ...msg)
