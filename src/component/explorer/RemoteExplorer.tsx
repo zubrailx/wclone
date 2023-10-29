@@ -5,6 +5,7 @@ import RemoteContextMenu, { RFileCap } from "./RemoteContextMenu.jsx";
 import Explorer, { ExplorerFunctions, FILE_NOT_SELECTED } from "./Explorer.jsx";
 import { Table, TableCell, TableHeadCell, TableHeadRow, TableRow } from "./Table.jsx";
 import { DriveRemote } from "../../remote/base.js";
+import { LocalFileEncryptor } from "../../cypher/base.js";
 
 function log(...msg: any) {
   return console.log('[RemoteExplorer]:', ...msg)
@@ -12,6 +13,7 @@ function log(...msg: any) {
 
 type Props = {
   curRemote: DriveRemote | undefined,
+  cypher: LocalFileEncryptor,
 }
 
 function RemoteExplorer(props: Props) {

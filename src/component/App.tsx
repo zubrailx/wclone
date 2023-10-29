@@ -29,8 +29,8 @@ function App() {
         <AddRemoteSection setRemotes={setRemotes} />
         <SelectRemoteSection remotes={remotes} setRemotes={setRemotes} setCurRemote={setCurRemote} />
         <SelectCypherSection setCypher={setCypher}/>
-        <RemoteExplorer curRemote={curRemote()} />
-        <LocalExplorer curRemote={curRemote()} />
+        <RemoteExplorer curRemote={curRemote()} cypher={cypher()}/>
+        <LocalExplorer curRemote={curRemote()} cypher={cypher()}/>
       </ApiProvider>
     </>
   )

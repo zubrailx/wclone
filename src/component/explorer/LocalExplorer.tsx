@@ -2,16 +2,15 @@ import { createSignal } from "solid-js";
 import { For } from "solid-js";
 import { EncryptableLocalFile, fromFile } from "../../localfile.js";
 import LocalContextMenu, { LFileCap } from "./LocalContextMenu.jsx";
-import { Algorithm } from "../../cypher/base.js";
+import { Algorithm, LocalFileEncryptor } from "../../cypher/base.js";
 import Explorer, { ExplorerFunctions, FILE_NOT_SELECTED } from "./Explorer.jsx";
 import { Table, TableCell, TableHeadCell, TableHeadRow, TableRow } from "./Table.jsx";
-import { AESFileEncryptor } from "../../cypher/aes.js";
-import { storageGetSecretKey } from "../../localstorage/localExplorer.js";
 import { DriveRemote } from "../../remote/base.js";
 import { useApiContext } from "./../DriveProvider.jsx";
 
 type Props = {
   curRemote: DriveRemote | undefined,
+  cypher: LocalFileEncryptor,
 }
 
 function log(...msg: any) {
@@ -74,10 +73,8 @@ function LocalExplorer(props: Props) {
 
   // create encrypt window
   function encryptFileOnClick() {
-    const secretKey = storageGetSecretKey();
-    const aesEncryptor = new AESFileEncryptor(secretKey);
     const file = files()[selFile()];
-    const encryptedFile = aesEncryptor.encryptFile(file);
+    const encryptedFile = props.cypher.encryptFile(file);
     setFiles((files) => {
       files[selFile()] = encryptedFile;
       return files;
@@ -85,10 +82,8 @@ function LocalExplorer(props: Props) {
   }
 
   function decryptFileOnClick() {
-    const secretKey = storageGetSecretKey();
-    const aesEncryptor = new AESFileEncryptor(secretKey)
     const file = files()[selFile()];
-    const decrFile = aesEncryptor.decryptFile(file);
+    const decrFile = props.cypher.decryptFile(file);
     setFiles((files) => {
       files[selFile()] = decrFile;
       return files;
