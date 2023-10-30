@@ -53,8 +53,8 @@ function SelectRemoteSection(props: Props) {
     await getRequiredApi(rem)
       .then((api) => {
         api.access(rem, () => {
-          setSelRemote(rem);
           updateRemote(rem);
+          setSelRemote(rem);
         });
         return api;
       });
@@ -70,15 +70,15 @@ function SelectRemoteSection(props: Props) {
     getRequiredApi(rem)
       .then((api) => {
         api.revoke(rem);
+        updateRemote(rem);
         setSelRemote(rem);
       })
-    updateRemote(rem);
   }
 
   async function deleteRemote() {
     await revokeAccess();
     const selRem = selRemote();
-    if (selRemote() != undefined) {
+    if (selRem != undefined) {
       const rem = findRemoteBySelected(props.remotes, selRem!)!; // not cloning
       props.setRemotes(props.remotes.filter((r) => r != rem));
     }
@@ -95,7 +95,7 @@ function SelectRemoteSection(props: Props) {
     <div>
       <h3>Select remote</h3>
       <label>Existing remotes:</label>
-      <select onChange={displaySelectedRemote}>
+      <select onChange={displaySelectedRemote} value={selRemote()?.getName()}>
         <For each={props.remotes}>{(remote, _) =>
           <option value={remote.getName()}>{remote.getName()}</option>
         }</For>
