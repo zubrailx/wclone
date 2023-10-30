@@ -3,12 +3,11 @@ import { For } from "solid-js";
 import { EncryptableLocalFile, fromFile } from "../../localfile.js";
 import LocalContextMenu, { LFileCap } from "./LocalContextMenu.jsx";
 import { Algorithm, LocalFileEncryptor } from "../../cypher/base.js";
-import Explorer, { ExplorerFunctions, FILE_NOT_SELECTED } from "./Explorer.jsx";
-import { Table, TableBodyRow, TableCell, TableHeadCell, TableHeadRow, TableRow } from "./Table.jsx";
+import Explorer, { ExplorerFunctions } from "./Explorer.jsx";
+import { Table, TableBodyRow, TableCell, TableHeadCell, TableHeadRow } from "./Table.jsx";
 import { DriveRemote } from "../../remote/base.js";
 import { useApiContext } from "./../DriveProvider.jsx";
 import { DriveFileMeta } from "../../api/base.js";
-import { clone } from "../../utils.js";
 
 type Props = {
   curRemote: DriveRemote | undefined,
@@ -16,6 +15,8 @@ type Props = {
   files: EncryptableLocalFile[],
   pwd: DriveFileMeta[],
   setFiles: Setter<EncryptableLocalFile[]>,
+  isAutoEncr: boolean,
+  setIsAutoEncr: Setter<boolean>,
 }
 
 function log(...msg: any) {
@@ -52,22 +53,28 @@ function LocalExplorer(props: Props) {
     }
   }
 
-  function downloadFileOnClick() {
-    const localFile = selFile()!;
+  function downloadFile(file: EncryptableLocalFile) {
     const downloadLink = document.createElement("a");
-    downloadLink.href = URL.createObjectURL(localFile.toFile());
+    downloadLink.href = URL.createObjectURL(file.toFile());
     downloadLink.setAttribute('download', '');
     downloadLink.style.visibility = 'none';
     downloadLink.style.position = 'absolute';
+    downloadLink.target = "_blank";
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
+
+  }
+
+  function downloadFileOnClick() {
+    const file = selFile()!;
+    downloadFile(file);
     setCMVisible(false);
   }
 
   function removeFileOnClick() {
     props.setFiles((files) => {
-      const  index = files.indexOf(selFile()!);
+      const index = files.indexOf(selFile()!);
       if (index !== -1) {
         files.splice(index, 1);
       }
@@ -93,13 +100,24 @@ function LocalExplorer(props: Props) {
     setCMVisible(false);
   }
 
+  async function processAutoEncryption(file: EncryptableLocalFile) {
+    let file1;
+    if (props.isAutoEncr) {
+      file1 = await props.cypher.encryptFile(file);
+    } else {
+      file1 = file;
+    }
+    return file1;
+  }
+
   async function uploadFileOnClick() {
     if (props.curRemote !== undefined) {
       const file = selFile()!;
       getRequiredApi(props.curRemote)
-        .then(api => {
-          return api.upload(props.curRemote!, props.pwd, file);
-        }).then((res) => {
+        .then(async (api) =>
+          processAutoEncryption(file)
+            .then(file => api.upload(props.curRemote!, props.pwd, file))
+        ).then((res) => {
           console.log(res);
         }).catch((e) => {
           alert(JSON.stringify(e));
@@ -108,12 +126,44 @@ function LocalExplorer(props: Props) {
     setCMVisible(false);
   }
 
+  async function removeAllFilesOnClick() {
+    props.setFiles([]);
+  }
+
+  async function uploadAllFilesOnClick() {
+    if (props.curRemote !== undefined) {
+      getRequiredApi(props.curRemote)
+        .then(async (api) => {
+          for (const file of props.files) {
+            processAutoEncryption(file)
+              .then(file => api.upload(props.curRemote!, props.pwd, file))
+              .then((res) => {
+                console.log(res);
+              }).catch((e) => {
+                alert(JSON.stringify(e));
+              })
+          }
+        })
+    }
+  }
+
+  async function downloadAllFilesOnClick() {
+    for (const file of props.files) {
+      downloadFile(file);
+    }
+  }
+
+
   const fn = {
     downloadFileOnClick: downloadFileOnClick,
     removeFileOnClick: removeFileOnClick,
     encryptFileOnClick: encryptFileOnClick,
     decryptFileOnClick: decryptFileOnClick,
     uploadFileOnClick: uploadFileOnClick
+  }
+
+  function checkAutoEncrOnChange() {
+    props.setIsAutoEncr((val) => !val);
   }
 
   return (
@@ -124,7 +174,18 @@ function LocalExplorer(props: Props) {
 
       <div class='localfile'>
         <h3>Local explorer</h3>
-        <input type="file" ref={inputFile} onChange={inputFileOnChange} value="Upload" multiple />
+        <div>
+          <input type="file" ref={inputFile} onChange={inputFileOnChange} value="Upload" multiple />
+        </div>
+        <div>
+          <button onClick={removeAllFilesOnClick}>Remove all</button>
+          <button onClick={uploadAllFilesOnClick}>Upload all</button>
+          <button onClick={downloadAllFilesOnClick}>Download all</button>
+          <input type="checkbox" checked={props.isAutoEncr} onChange={checkAutoEncrOnChange} />
+          <span>
+            Enable auto encryption
+          </span>
+        </div>
         <Table setRef={setTable}>
           <TableHeadRow visible={headerVisible()}>
             <TableHeadCell>Algorithm</TableHeadCell>
@@ -146,7 +207,7 @@ function LocalExplorer(props: Props) {
         <LocalContextMenu fn={fn} visible={CMVisible()} position={CMPosition()}
           Ref={contextMenu()} setRef={setContextMenu} capabilities={capabilities()} />
       </div>
-    </Explorer>
+    </Explorer >
   )
 }
 

@@ -18,8 +18,9 @@ function App() {
   const [remotes, setRemotes] = createStore<DriveRemote[]>(storageGetRemotes());
   const [curRemote, setCurRemote] = createSignal<DriveRemote>();
   const [cypher, setCypher] = createSignal<LocalFileEncryptor>({} as LocalFileEncryptor);
-  const [files, setFiles] = createSignal<EncryptableLocalFile[]>([], {equals: false});
-  const [pwd, setPwd] = createSignal<DriveFileMeta[]>([], {equals: false});
+  const [files, setFiles] = createSignal<EncryptableLocalFile[]>([], { equals: false });
+  const [pwd, setPwd] = createSignal<DriveFileMeta[]>([], { equals: false });
+  const [isAutoEncr, setIsAutoEncr] = createSignal(false);
 
   createEffect(() => {
     if (remotes) {
@@ -33,8 +34,11 @@ function App() {
         <AddRemoteSection setRemotes={setRemotes} />
         <SelectRemoteSection remotes={remotes} setRemotes={setRemotes} setCurRemote={setCurRemote} />
         <SelectCypherSection setCypher={setCypher} />
-        <RemoteExplorer curRemote={curRemote()} cypher={cypher()} setLocal={setFiles} pwd={pwd()} setPwd={setPwd}/>
-        <LocalExplorer curRemote={curRemote()} cypher={cypher()} files={files()} setFiles={setFiles} pwd={pwd()}/>
+        <RemoteExplorer curRemote={curRemote()} cypher={cypher()}
+          setLocal={setFiles} pwd={pwd()} setPwd={setPwd} isAutoEncr={isAutoEncr()}/>
+        <LocalExplorer curRemote={curRemote()} cypher={cypher()}
+          files={files()} setFiles={setFiles} pwd={pwd()}
+          isAutoEncr={isAutoEncr()} setIsAutoEncr={setIsAutoEncr} />
       </ApiProvider>
     </>
   )

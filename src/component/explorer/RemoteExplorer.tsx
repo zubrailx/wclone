@@ -18,7 +18,8 @@ type Props = {
   cypher: LocalFileEncryptor,
   pwd: DriveFileMeta[],
   setPwd: Setter<DriveFileMeta[]>,
-  setLocal: Setter<EncryptableLocalFile[]>
+  setLocal: Setter<EncryptableLocalFile[]>,
+  isAutoEncr: boolean,
 }
 
 function RemoteExplorer(props: Props) {
@@ -34,7 +35,6 @@ function RemoteExplorer(props: Props) {
   const [explorerFunctions, setExplorerFunctions] = createSignal<ExplorerFunctions>({} as ExplorerFunctions);
   const [headerVisible, setHeaderVisible] = createSignal<boolean>(false);
   const [table, setTable] = createSignal();
-  const [showParent, setShowParent] = createSignal<boolean>(false);
 
   const [capabilities, setCapabilities] = createSignal<RFileCap[]>([]);
 
@@ -75,6 +75,13 @@ function RemoteExplorer(props: Props) {
     }
   }
 
+  async function processAutoEncryption(file: EncryptableLocalFile) {
+    if (props.isAutoEncr) {
+      return props.cypher.decryptFile(file);
+    }
+    return file;
+  }
+
   function downloadFileOnClick() {
     const file = selFile();
     if (props.curRemote !== undefined && file != null) {
@@ -82,6 +89,7 @@ function RemoteExplorer(props: Props) {
         .then(api => {
           return api.download(props.curRemote!, file);
         })
+        .then(file => processAutoEncryption(file))
         .then((r) => {
           props.setLocal((files) => [...files, r])
           console.log(r);
@@ -98,8 +106,6 @@ function RemoteExplorer(props: Props) {
       getRequiredApi(props.curRemote)
         .then(api => {
           api.remove(props.curRemote!, file);
-        }).then((r) => {
-          console.log(r);
         }).catch((e) => {
           alert(JSON.stringify(e));
         })
@@ -161,7 +167,7 @@ function RemoteExplorer(props: Props) {
       <div class='remotefile'>
         <h3>Remote explorer</h3>
         <div>
-          <button onClick={listFilesOnClick}>List remote files</button>
+          <button onClick={listFilesOnClick}>List remote</button>
           <span>Working directory: {getPwdString(props.pwd)}</span>
         </div>
         <Table setRef={setTable}>
