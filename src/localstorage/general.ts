@@ -5,3 +5,4 @@ export const STORAGE_SECRET_DEFAULT = "secret";
 
 export const STORAGE_CYPHER_KEY = "cyphers";
 
+export const STORAGE_AUTO_ENCRYPTION = "auto_encryption";

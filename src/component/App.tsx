@@ -13,6 +13,7 @@ import SelectCypherSection from './cypher/SelectCypherSection.jsx';
 import { LocalFileEncryptor } from '../cypher/base.js';
 import { EncryptableLocalFile } from '../localfile.js';
 import { DriveFileMeta } from '../api/base.js';
+import { storageGetAutoEncryption, storageSetAutoEncryption } from '../localstorage/cypher.js';
 
 function App() {
   const [remotes, setRemotes] = createStore<DriveRemote[]>(storageGetRemotes());
@@ -20,12 +21,16 @@ function App() {
   const [cypher, setCypher] = createSignal<LocalFileEncryptor>({} as LocalFileEncryptor);
   const [files, setFiles] = createSignal<EncryptableLocalFile[]>([], { equals: false });
   const [pwd, setPwd] = createSignal<DriveFileMeta[]>([], { equals: false });
-  const [isAutoEncr, setIsAutoEncr] = createSignal(false);
+  const [isAutoEncr, setIsAutoEncr] = createSignal(storageGetAutoEncryption());
 
   createEffect(() => {
     if (remotes) {
       storageSetRemotes(remotes);
     }
+  })
+
+  createEffect(() => {
+    storageSetAutoEncryption(isAutoEncr());
   })
 
   return (
@@ -35,7 +40,7 @@ function App() {
         <SelectRemoteSection remotes={remotes} setRemotes={setRemotes} setCurRemote={setCurRemote} />
         <SelectCypherSection setCypher={setCypher} />
         <RemoteExplorer curRemote={curRemote()} cypher={cypher()}
-          setLocal={setFiles} pwd={pwd()} setPwd={setPwd} isAutoEncr={isAutoEncr()}/>
+          setLocal={setFiles} pwd={pwd()} setPwd={setPwd} isAutoEncr={isAutoEncr()} />
         <LocalExplorer curRemote={curRemote()} cypher={cypher()}
           files={files()} setFiles={setFiles} pwd={pwd()}
           isAutoEncr={isAutoEncr()} setIsAutoEncr={setIsAutoEncr} />

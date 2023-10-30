@@ -1,7 +1,7 @@
 import { AESFileEncryptor } from "../cypher/aes.js";
 import { LocalFileEncryptor } from "../cypher/base.js";
 import { clone } from "../utils.js";
-import { STORAGE_CYPHER_KEY } from "./general.js";
+import { STORAGE_AUTO_ENCRYPTION, STORAGE_CYPHER_KEY } from "./general.js";
 
 export function storageGetCypherConfigured(_encr: LocalFileEncryptor): LocalFileEncryptor {
   const _item = window.localStorage.getItem(STORAGE_CYPHER_KEY)
@@ -44,4 +44,13 @@ export function storageSetCyphersConfigured(encrs: LocalFileEncryptor[]) {
   encrs.forEach(encr => {
     storageSetCypherConfigured(encr);
   });
+}
+
+export function storageGetAutoEncryption(): boolean {
+  const elem = window.localStorage.getItem(STORAGE_AUTO_ENCRYPTION);
+  return elem === 'true';
+}
+
+export function storageSetAutoEncryption(v: boolean) {
+  window.localStorage.setItem(STORAGE_AUTO_ENCRYPTION, String(v));
 }
