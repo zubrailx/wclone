@@ -1,18 +1,15 @@
 import { Setter, createSignal, onMount } from "solid-js"
-import GeneralAdd, { CreateRemoteFN } from "./GeneralAdd.jsx";
+import GeneralAdd, { CreateRemoteFN } from "./AddGeneral.jsx";
 import { GDriveRemote } from "../../remote/gdrive.js";
 
 type Props = {
   setCreateRemote: Setter<CreateRemoteFN | undefined>
 }
 
-const _clientId = "695678300880-k19jfgsgnob6fil49kpilb3r04aior9v.apps.googleusercontent.com"
-const _apiKey = "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"
-
 function GDriveAdd(props: Props) {
 
-  const [clientId, setClientId] = createSignal<string>(_clientId);
-  const [apiKey, setApiKey] = createSignal<string>(_apiKey);
+  const [clientId, setClientId] = createSignal<string>("");
+  const [apiKey, setApiKey] = createSignal<string>("");
   const [name, setName] = createSignal<string>("");
 
   onMount(() => {

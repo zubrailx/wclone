@@ -1,6 +1,6 @@
 import { Accessor, For, JSXElement, Match, Setter, Switch, createSignal } from "solid-js";
-import GDriveAdd from "./GDriveAdd.jsx";
-import { CreateRemoteFN } from "./GeneralAdd.jsx";
+import GDriveAdd from "./AddGDrive.jsx";
+import { CreateRemoteFN } from "./AddGeneral.jsx";
 import { DriveRemote } from "../../remote/base.js";
 
 type Props = {
