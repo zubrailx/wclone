@@ -1,4 +1,4 @@
-import { Setter, onMount } from "solid-js"
+import { Setter, createSignal, onMount } from "solid-js"
 
 function Table(props: { setRef: Setter<any>, children: any }) {
   let ref: any;
@@ -14,9 +14,26 @@ function Table(props: { setRef: Setter<any>, children: any }) {
   )
 }
 
-function TableRow(props: { class?: string, children: any, style?: any, onContextMenu?: any }) {
+type onContextMenu = (row: HTMLElement) => ((e: MouseEvent) => void);
+
+type TableRowProps = {
+  class?: string,
+  children: any,
+  style?: any,
+  onContextMenu?: onContextMenu,
+}
+
+function TableRow(props: TableRowProps) {
+  let [divRef, setDivRef] = createSignal<HTMLElement>();
+
+  function onContextMenu(e: MouseEvent) {
+    if (props.onContextMenu !== undefined) {
+      return props.onContextMenu(divRef()!)(e)
+    }
+  }
+
   return (
-    <div class='row' style={props.style} onContextMenu={props.onContextMenu}>
+    <div ref={setDivRef} class={"row" + (props.class == null ? "" : " " + props.class)} style={props.style} onContextMenu={onContextMenu} >
       {...props.children}
     </div >
   )
@@ -39,10 +56,23 @@ function TableHeadRow(props: { children: any, visible?: boolean }) {
   )
 }
 
+type TableBodyRowProps = {
+  children: any,
+  onContextMenu?: (row: HTMLElement) => ((e: MouseEvent) => void)
+}
+
+function TableBodyRow(props: TableBodyRowProps) {
+  return (
+    <TableRow class='body' onContextMenu={props.onContextMenu}>
+      {...props.children}
+    </TableRow>
+  )
+}
+
 function TableHeadCell(props: { children: any }) {
   return (
     <TableCell class='head'>{...props.children}</TableCell>
   )
 }
 
-export { Table, TableRow, TableCell, TableHeadRow, TableHeadCell }
+export { Table, TableRow, TableCell, TableHeadRow, TableHeadCell, TableBodyRow }

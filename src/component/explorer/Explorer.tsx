@@ -8,7 +8,7 @@ type Position = {
 };
 
 type ExplorerFunctions = {
-  onRowClick: Function
+  onRowContextMenu: (file: any) => ((row: HTMLElement) => ((e: MouseEvent) => void))
 }
 
 type Props = {
@@ -31,13 +31,15 @@ type Props = {
   children?: any
 };
 
+const SELECTED_CLASS = "selected";
+
 
 // Explorer handler
 function Explorer(props: Props) {
 
   onMount(() => {
     props.tableFunctions({
-      onRowClick: onRowClick
+      onRowContextMenu: onRowContextMenu
     })
   })
 
@@ -58,26 +60,46 @@ function Explorer(props: Props) {
     props.tableSetHeaderVisible(props.filesList.length > 0)
   })
 
-  // Context Menu
-  function onRowClick(file: any) {
-    return function(e: MouseEvent) {
-      // TODO: reformat to position context menu properly
-      let x = e.pageX;
-      let y = e.pageY;
-      props.CMSetPosition({ x: x, y: y });
-      if (props.filesSelected == FILE_NOT_SELECTED) {
-        window.addEventListener('contextmenu', unselectForContextMenu);
-        window.addEventListener('click', unselectForClick);
-      }
-      const selFile = props.filesList.indexOf(file);
-      props.filesSetSelected(selFile);
+  const selectedRows: HTMLElement[] = []
+
+  function unselectRows() {
+    // remove selection
+    for (const row of selectedRows) {
+      row.classList.remove(SELECTED_CLASS);
+    }
+    while (selectedRows.length) {
+      selectedRows.pop();
     }
   }
+
+  // Context Menu
+  function onRowContextMenu(file: any) {
+    return function(row: HTMLElement) {
+      return function(e: MouseEvent) {
+        unselectRows();
+        row.classList.add(SELECTED_CLASS);
+        selectedRows.push(row);
+
+        props.CMSetPosition({ x: e.pageX + 1, y: e.pageY + 1 });
+
+        if (props.filesSelected == FILE_NOT_SELECTED) {
+          e.stopPropagation();
+          e.preventDefault();
+          window.addEventListener('contextmenu', unselectForContextMenu);
+          window.addEventListener('click', unselectForClick);
+        }
+        const selFile = props.filesList.indexOf(file);
+        props.filesSetSelected(selFile);
+      }
+    }
+  }
+
 
   createEffect(() => {
     if (props.filesSelected == FILE_NOT_SELECTED) {
       window.removeEventListener('contextmenu', unselectForContextMenu);
       window.removeEventListener('click', unselectForClick);
+      unselectRows();
     }
   })
 
@@ -99,7 +121,7 @@ function Explorer(props: Props) {
     const y = ev.clientY;
     const elementsUnder = document.elementsFromPoint(x, y);
     for (const elem of elementsUnder) {
-      if (elem == props.table || elem == props.CMElement) {
+      if (elem == props.CMElement || elem == props.table) {
         return;
       }
     }

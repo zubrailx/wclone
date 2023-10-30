@@ -14,21 +14,31 @@
       display: table-cell;
       border-style: solid;
       border-width: 1px 0px 0px 1px;
+
+      &.head {
+        font-weight: 600;
+      }
+
+      &:last-child {
+        border-width: 1px 1px 0px 1px;
+      }
     }
-    .cell:last-child {
-      border-width: 1px 1px 0px 1px;
+    &.body:hover {
+      background-color: rgba(52, 91, 235, 0.5);
+
     }
-    .head {
-      font-weight: 600;
+    &.body.selected {
+      background-color: rgba(52, 91, 235, 0.7)
     }
-  }
-  .row:last-child {
-    .cell {
-      border-style: solid;
-      border-width: 1px 0px 1px 1px;
-    }
-    .cell:last-child {
-      border-width: 1px 1px 1px 1px;
+    &:last-child {
+      .cell {
+        border-style: solid;
+        border-width: 1px 0px 1px 1px;
+        &:last-child {
+          border-width: 1px 1px 1px 1px;
+        }
+      }
+
     }
   }
 }
@@ -44,10 +54,10 @@
     border: solid;
     border-width: 1px 1px 0px 1px;
     opacity: 1;
-  }
 
-  div:last-child {
-    border-width: 1px 1px 1px 1px;
+    &:last-child {
+      border-width: 1px 1px 1px 1px;
+    }
   }
 
   .element:hover {

@@ -3,7 +3,7 @@ import { DriveFileMeta } from "../../api/base.js";
 import { useApiContext } from "./../DriveProvider.jsx";
 import RemoteContextMenu, { RFileCap } from "./RemoteContextMenu.jsx";
 import Explorer, { ExplorerFunctions, FILE_NOT_SELECTED } from "./Explorer.jsx";
-import { Table, TableCell, TableHeadCell, TableHeadRow, TableRow } from "./Table.jsx";
+import { Table, TableBodyRow, TableCell, TableHeadCell, TableHeadRow, TableRow } from "./Table.jsx";
 import { DriveRemote } from "../../remote/base.js";
 import { LocalFileEncryptor } from "../../cypher/base.js";
 import { EncryptableLocalFile } from "../../localfile.js";
@@ -31,9 +31,7 @@ function RemoteExplorer(props: Props) {
   const [CMVisible, setCMVisible] = createSignal<boolean>(false);
   const [contextMenu, setContextMenu] = createSignal();
 
-  const [explorerFunctions, setExplorerFunctions] = createSignal<ExplorerFunctions>({
-    onRowClick: Function,
-  });
+  const [explorerFunctions, setExplorerFunctions] = createSignal<ExplorerFunctions>({} as ExplorerFunctions);
   const [headerVisible, setHeaderVisible] = createSignal<boolean>(false);
   const [table, setTable] = createSignal();
   const [showParent, setShowParent] = createSignal<boolean>(false);
@@ -142,14 +140,16 @@ function RemoteExplorer(props: Props) {
     return res;
   }
 
-  function onRowClick(callback: any, file: DriveFileMeta): (e: MouseEvent) => any {
-    return function(e: Event) {
-      if (file.isFolder()) {
-        setCapabilities([RFileCap.CHANGE_DIRECTORY]);
-      } else {
-        setCapabilities([RFileCap.REMOVE, RFileCap.DOWNLOAD]);
+  function onRowContextMenu(callback: any, file: DriveFileMeta): (r: HTMLElement) => (e: MouseEvent) => any {
+    return function(r: HTMLElement) {
+      return function(e: Event) {
+        if (file.isFolder()) {
+          setCapabilities([RFileCap.CHANGE_DIRECTORY]);
+        } else {
+          setCapabilities([RFileCap.REMOVE, RFileCap.DOWNLOAD]);
+        }
+        return callback(file)(r)(e)
       }
-      return callback(file)(e)
     }
   }
 
@@ -173,12 +173,12 @@ function RemoteExplorer(props: Props) {
             <TableHeadCell>Mime Type</TableHeadCell>
           </TableHeadRow>
           <For each={files()}>{(file, _) =>
-            <TableRow onContextMenu={onRowClick(explorerFunctions().onRowClick, file)}>
+            <TableBodyRow onContextMenu={onRowContextMenu(explorerFunctions().onRowContextMenu, file)}>
               <TableCell>{file.getName()}</TableCell>
               <TableCell>{file.getSize()}</TableCell>
               <TableCell>{file.getCreatedTime().toLocaleString()}</TableCell>
               <TableCell>{file.getMimeType().toLocaleString()}</TableCell>
-            </TableRow>
+            </TableBodyRow>
           }</For>
         </Table>
         <RemoteContextMenu fn={fn} position={CMPosition()} visible={CMVisible()}

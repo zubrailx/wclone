@@ -4,7 +4,7 @@ import { EncryptableLocalFile, fromFile } from "../../localfile.js";
 import LocalContextMenu, { LFileCap } from "./LocalContextMenu.jsx";
 import { Algorithm, LocalFileEncryptor } from "../../cypher/base.js";
 import Explorer, { ExplorerFunctions, FILE_NOT_SELECTED } from "./Explorer.jsx";
-import { Table, TableCell, TableHeadCell, TableHeadRow, TableRow } from "./Table.jsx";
+import { Table, TableBodyRow, TableCell, TableHeadCell, TableHeadRow, TableRow } from "./Table.jsx";
 import { DriveRemote } from "../../remote/base.js";
 import { useApiContext } from "./../DriveProvider.jsx";
 import { DriveFileMeta } from "../../api/base.js";
@@ -30,9 +30,7 @@ function LocalExplorer(props: Props) {
   const [CMPosition, setCMPosition] = createSignal({ x: 0, y: 0 });
   const [contextMenu, setContextMenu] = createSignal()
 
-  const [explorerFunctions, setExplorerFunctions] = createSignal<ExplorerFunctions>({
-    onRowClick: Function,
-  });
+  const [explorerFunctions, setExplorerFunctions] = createSignal<ExplorerFunctions>({} as ExplorerFunctions);
   const [headerVisible, setHeaderVisible] = createSignal<boolean>(false);
   const [table, setTable] = createSignal();
 
@@ -132,13 +130,13 @@ function LocalExplorer(props: Props) {
             <TableHeadCell>Mime Type</TableHeadCell>
           </TableHeadRow>
           <For each={props.files}>{(file, _) =>
-            <TableRow onContextMenu={explorerFunctions().onRowClick(file)}>
+            <TableBodyRow onContextMenu={explorerFunctions().onRowContextMenu(file)}>
               <TableCell>{Algorithm[file.getEncryptAlgorithm()]}</TableCell>
               <TableCell>{file.getName()}</TableCell>
               <TableCell>{file.getSize()}</TableCell>
               <TableCell>{file.getModifiedTime().toLocaleString()}</TableCell>
               <TableCell>{file.getMimeType().toString()}</TableCell>
-            </TableRow>
+            </TableBodyRow>
           }</For>
         </Table>
         <LocalContextMenu fn={fn} visible={CMVisible()} position={CMPosition()}
