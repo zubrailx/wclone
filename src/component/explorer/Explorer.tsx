@@ -1,7 +1,5 @@
 import { Setter, createEffect, onCleanup, onMount } from "solid-js";
 
-const FILE_NOT_SELECTED = -1;
-
 type Position = {
   x: number;
   y: number;
@@ -13,8 +11,8 @@ type ExplorerFunctions = {
 
 type Props = {
   filesList: any[],
-  filesSelected: number,
-  filesSetSelected: Setter<number>,
+  filesSelected: any,
+  filesSetSelected: Setter<any>,
 
   table: unknown,
   tableSetHeaderVisible: Setter<boolean>,
@@ -31,10 +29,10 @@ type Props = {
   children?: any
 };
 
+const FILE_NOT_SELECTED = null;
 const SELECTED_CLASS = "selected";
 
 
-// Explorer handler
 function Explorer(props: Props) {
 
   onMount(() => {
@@ -88,8 +86,7 @@ function Explorer(props: Props) {
           window.addEventListener('contextmenu', unselectForContextMenu);
           window.addEventListener('click', unselectForClick);
         }
-        const selFile = props.filesList.indexOf(file);
-        props.filesSetSelected(selFile);
+        props.filesSetSelected(file);
       }
     }
   }

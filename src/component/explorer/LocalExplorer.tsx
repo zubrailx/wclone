@@ -8,6 +8,7 @@ import { Table, TableBodyRow, TableCell, TableHeadCell, TableHeadRow, TableRow }
 import { DriveRemote } from "../../remote/base.js";
 import { useApiContext } from "./../DriveProvider.jsx";
 import { DriveFileMeta } from "../../api/base.js";
+import { clone } from "../../utils.js";
 
 type Props = {
   curRemote: DriveRemote | undefined,
@@ -24,7 +25,7 @@ function log(...msg: any) {
 function LocalExplorer(props: Props) {
   const [_, { getRequiredApi }] = useApiContext();
 
-  const [selFile, setSelFile] = createSignal(FILE_NOT_SELECTED);
+  const [selFile, setSelFile] = createSignal<EncryptableLocalFile | null>(null);
 
   const [CMVisible, setCMVisible] = createSignal<boolean>(false);
   const [CMPosition, setCMPosition] = createSignal({ x: 0, y: 0 });
@@ -52,7 +53,7 @@ function LocalExplorer(props: Props) {
   }
 
   function downloadFileOnClick() {
-    const localFile = props.files[selFile()];
+    const localFile = selFile()!;
     const downloadLink = document.createElement("a");
     downloadLink.href = URL.createObjectURL(localFile.toFile());
     downloadLink.setAttribute('download', '');
@@ -66,13 +67,16 @@ function LocalExplorer(props: Props) {
 
   function removeFileOnClick() {
     props.setFiles((files) => {
-      files.splice(selFile(), 1);
+      const  index = files.indexOf(selFile()!);
+      if (index !== -1) {
+        files.splice(index, 1);
+      }
       return files
     });
   }
 
   async function encryptFileOnClick() {
-    const file = props.files[selFile()];
+    const file = selFile()!;
     props.cypher.encryptFile(file)
       .then((r) => {
         props.setFiles((files) => files.map((f) => f == file ? r : f));
@@ -81,7 +85,7 @@ function LocalExplorer(props: Props) {
   }
 
   async function decryptFileOnClick() {
-    const file = props.files[selFile()];
+    const file = selFile()!;
     props.cypher.decryptFile(file)
       .then((r) => {
         props.setFiles((files) => files.map((f) => f == file ? r : f));
@@ -91,7 +95,7 @@ function LocalExplorer(props: Props) {
 
   async function uploadFileOnClick() {
     if (props.curRemote !== undefined) {
-      const file = props.files[selFile()];
+      const file = selFile()!;
       getRequiredApi(props.curRemote)
         .then(api => {
           return api.upload(props.curRemote!, props.pwd, file);

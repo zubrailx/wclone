@@ -25,7 +25,7 @@ function RemoteExplorer(props: Props) {
   const [_, { getRequiredApi }] = useApiContext();
 
   const [files, setFiles] = createSignal<DriveFileMeta[]>([]);
-  const [selFile, setSelFile] = createSignal(FILE_NOT_SELECTED);
+  const [selFile, setSelFile] = createSignal<DriveFileMeta | null>(null);
 
   const [CMPosition, setCMPosition] = createSignal({ x: 0, y: 0 });
   const [CMVisible, setCMVisible] = createSignal<boolean>(false);
@@ -76,7 +76,7 @@ function RemoteExplorer(props: Props) {
   }
 
   function downloadFileOnClick() {
-    const file = files()[selFile()];
+    const file = selFile();
     if (props.curRemote !== undefined && file != null) {
       getRequiredApi(props.curRemote)
         .then(api => {
@@ -93,7 +93,7 @@ function RemoteExplorer(props: Props) {
   }
 
   function removeFileOnClick() {
-    const file = files()[selFile()];
+    const file = selFile();
     if (props.curRemote !== undefined && file != null) {
       getRequiredApi(props.curRemote)
         .then(api => {
@@ -108,8 +108,7 @@ function RemoteExplorer(props: Props) {
   }
 
   function changeDirectoryOnClick() {
-    const file = files()[selFile()];
-
+    const file = selFile();
     if (props.curRemote !== undefined && file != null) {
       const toParent: boolean = props.pwd.length > 0
         && file.getId() == props.pwd[props.pwd.length - 1].getId();
