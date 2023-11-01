@@ -6,15 +6,17 @@ import { STORAGE_AUTO_ENCRYPTION, STORAGE_CYPHER_KEY } from "./general.js";
 export function storageGetCypherConfigured(_encr: LocalFileEncryptor): LocalFileEncryptor {
   const _item = window.localStorage.getItem(STORAGE_CYPHER_KEY)
   const encr = clone(_encr);
-  if (_item === null) {
+  if (_item == null) {
     return encr;
   }
   const item = JSON.parse(_item);
 
   if (_encr instanceof AESFileEncryptor) {
     const elem = item["aes"]
-    const aes: AESFileEncryptor = encr as AESFileEncryptor;
-    aes.secretKey = elem.secretKey;
+    if (elem != null) {
+      const aes: AESFileEncryptor = encr as AESFileEncryptor;
+      aes.secretKey = elem.secretKey;
+    }
   }
 
   return encr;
@@ -27,13 +29,16 @@ export function storageGetCyphersConfigured(encrs: LocalFileEncryptor[]): LocalF
 export function storageSetCypherConfigured(encr: LocalFileEncryptor) {
   const _item = window.localStorage.getItem(STORAGE_CYPHER_KEY);
   let item;
-  if (_item === null) {
+  if (_item == null) {
     item = {} as any;
   } else {
     item = JSON.parse(_item);
   }
 
   if (encr instanceof AESFileEncryptor) {
+    if (item["aes"] == null) {
+      item["aes"] = {}
+    }
     const elem = item["aes"] as any;
     elem.secretKey = encr.secretKey;
   }
