@@ -1,25 +1,20 @@
-## Usage
+# wclone
 
-```bash
-$ npm install # or pnpm install or yarn install
-```
+Web-application to access different remote file storages in an identical manner. Only frontend server required.
 
-## Available Scripts
+Currently supported backends:
 
-In the project directory, you can run:
+* Google Drive
 
-### `npm run dev`
+Currently supported operations:
 
-Runs the app in the development mode.<br>
-Open [http://localhost:5173](http://localhost:5173) to view it in the browser.
+* List
+* Change directory
+* Remove
+* Upload
+* Encryption (AES)
 
-### `npm run build`
-
-Builds the app for production to the `dist` folder.<br>
-
-## Deployment
-
-Learn more about deploying application with the [documentations](https://vitejs.dev/guide/static-deploy.html)
+Stores configuration in localStorage.
 
 ## TODO
 
