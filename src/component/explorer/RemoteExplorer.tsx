@@ -82,6 +82,18 @@ function RemoteExplorer(props: Props) {
     return file;
   }
 
+  function downloadFile(file: EncryptableLocalFile) {
+    const downloadLink = document.createElement("a");
+    downloadLink.href = URL.createObjectURL(file.toFile());
+    downloadLink.setAttribute('download', '');
+    downloadLink.style.visibility = 'none';
+    downloadLink.style.position = 'absolute';
+    downloadLink.target = "_blank";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+  }
+
   function downloadFileOnClick() {
     const file = selFile();
     if (props.curRemote !== undefined && file != null) {
@@ -91,7 +103,7 @@ function RemoteExplorer(props: Props) {
         })
         .then(file => processAutoEncryption(file))
         .then((r) => {
-          props.setLocal((files) => [...files, r])
+          downloadFile(r)
           console.log(r);
         }).catch((e) => {
           alert(JSON.stringify(e));

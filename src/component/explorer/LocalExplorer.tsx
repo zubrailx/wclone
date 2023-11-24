@@ -63,7 +63,6 @@ function LocalExplorer(props: Props) {
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
-
   }
 
   function downloadFileOnClick() {
