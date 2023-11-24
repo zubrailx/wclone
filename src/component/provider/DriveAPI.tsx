@@ -5,7 +5,7 @@ import { DriveRemote } from "../../remote/base.js";
 import { GDriveRemote } from "../../remote/gdrive.js";
 import { GDriveAPI } from "../../api/gdrive.js";
 
-const ApiContext = createContext();
+const context = createContext();
 
 type Props = {
   children?: any
@@ -56,14 +56,14 @@ function DriveAPIProvider(props: Props) {
   ]
 
   return (
-    <ApiContext.Provider value={driveApis} >
+    <context.Provider value={driveApis} >
       {...props.children}
-    </ApiContext.Provider>
+    </context.Provider>
   )
 }
 
 function useDriveAPIContext(): DriveAPIContext {
-  return useContext(ApiContext) as DriveAPIContext;
+  return useContext(context) as DriveAPIContext;
 }
 
 export { DriveAPIProvider, useDriveAPIContext }

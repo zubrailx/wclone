@@ -162,10 +162,6 @@ function LocalExplorer(props: Props) {
     uploadFileOnClick: uploadFileOnClick
   }
 
-  function checkAutoEncrOnChange() {
-    props.setIsAutoEncr((val) => !val);
-  }
-
   return (
     <Explorer filesList={props.files} filesSelected={selFile()} filesSetSelected={setSelFile}
       table={table()} tableFunctions={setExplorerFunctions} tableSetHeaderVisible={setHeaderVisible}
@@ -181,10 +177,6 @@ function LocalExplorer(props: Props) {
           <button onClick={removeAllFilesOnClick}>Remove all</button>
           <button onClick={uploadAllFilesOnClick}>Upload all</button>
           <button onClick={downloadAllFilesOnClick}>Download all</button>
-          <input type="checkbox" checked={props.isAutoEncr} onChange={checkAutoEncrOnChange} />
-          <span>
-            Enable auto encryption
-          </span>
         </div>
         <Table setRef={setTable}>
           <TableHeadRow visible={headerVisible()}>
