@@ -1,7 +1,7 @@
 import { Accessor, For, JSXElement, Match, Setter, Switch, createSignal } from "solid-js";
-import GDriveAdd from "./AddGDrive.jsx";
-import { CreateRemoteFN } from "./AddGeneral.jsx";
-import { DriveRemote } from "../../remote/base.js";
+import GDrive from "./GDrive.jsx";
+import { CreateRemoteFN } from "./General.jsx";
+import { DriveRemote } from "../../../remote/base.js";
 
 type Props = {
   setRemotes: Setter<DriveRemote[]>
@@ -31,12 +31,12 @@ function setDriveArr() {
   {
     const [val, change] = createSignal<CreateRemoteFN>();
     driveArr.push([val, change, new DriveEntry(
-      "gdrive", "Google Drive API", <GDriveAdd setCreateRemote={change} />)]);
+      "gdrive", "Google Drive API", <GDrive setCreateRemote={change} />)]);
   }
   return driveArr;
 }
 
-function AddRemoteSection(props: Props) {
+function Section(props: Props) {
   const driveArr: DriveElem[] = setDriveArr();
   const [drive, setDrive] = createSignal<DriveElem>(driveArr[0]);
 
@@ -81,4 +81,4 @@ function AddRemoteSection(props: Props) {
   )
 }
 
-export default AddRemoteSection
+export default Section

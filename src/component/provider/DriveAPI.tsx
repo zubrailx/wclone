@@ -1,9 +1,9 @@
 import { createContext, useContext } from "solid-js";
 import { produce, createStore } from "solid-js/store";
-import { DriveAPI } from "../api/base.js";
-import { DriveRemote } from "../remote/base.js";
-import { GDriveRemote } from "../remote/gdrive.js";
-import { GDriveAPI } from "../api/gdrive.js";
+import { DriveAPI } from "../../api/base.js";
+import { DriveRemote } from "../../remote/base.js";
+import { GDriveRemote } from "../../remote/gdrive.js";
+import { GDriveAPI } from "../../api/gdrive.js";
 
 const ApiContext = createContext();
 
@@ -18,7 +18,7 @@ type DriveAPIContext = [
   }
 ]
 
-export function ApiProvider(props: Props) {
+function DriveAPIProvider(props: Props) {
   const [apis, setApis] = createStore<DriveAPI[]>([]);
 
   function getApiByClass<T extends DriveAPI>(Clazz: new () => T): T {
@@ -62,6 +62,9 @@ export function ApiProvider(props: Props) {
   )
 }
 
-export function useApiContext(): DriveAPIContext {
+function useDriveAPIContext(): DriveAPIContext {
   return useContext(ApiContext) as DriveAPIContext;
 }
+
+export { DriveAPIProvider, useDriveAPIContext }
+export type { DriveAPIContext }

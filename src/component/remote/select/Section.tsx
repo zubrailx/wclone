@@ -1,8 +1,8 @@
 import { For, Setter, createEffect, createSignal } from "solid-js"
-import { DriveRemote } from "../../remote/base.js"
-import { useApiContext } from "../DriveProvider.jsx";
+import { DriveRemote } from "../../../remote/base.js"
+import { useDriveAPIContext } from "../../provider/DriveAPI.jsx";
 import { SetStoreFunction } from "solid-js/store";
-import { clone } from "../../utils.js";
+import { clone } from "../../../utils.js";
 
 type Props = {
   remotes: DriveRemote[],
@@ -15,10 +15,10 @@ type SelectEvent = Event & {
   target: HTMLSelectElement;
 };
 
-function SelectRemoteSection(props: Props) {
+function Section(props: Props) {
 
   const [selRemote, setSelRemote] = createSignal<DriveRemote>();
-  const [_, { getRequiredApi }] = useApiContext()
+  const [_, { getRequiredApi }] = useDriveAPIContext()
 
   createEffect(() => {
     if (props.remotes.length > 0 && selRemote() === undefined) {
@@ -109,4 +109,4 @@ function SelectRemoteSection(props: Props) {
   )
 }
 
-export default SelectRemoteSection
+export default Section

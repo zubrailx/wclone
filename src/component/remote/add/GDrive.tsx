@@ -1,12 +1,12 @@
 import { Setter, createSignal, onMount } from "solid-js"
-import GeneralAdd, { CreateRemoteFN } from "./AddGeneral.jsx";
-import { GDriveRemote } from "../../remote/gdrive.js";
+import General, { CreateRemoteFN } from "./General.jsx";
+import { GDriveRemote } from "../../../remote/gdrive.js";
 
 type Props = {
   setCreateRemote: Setter<CreateRemoteFN | undefined>
 }
 
-function GDriveAdd(props: Props) {
+function GDrive(props: Props) {
 
   const [clientId, setClientId] = createSignal<string>("");
   const [apiKey, setApiKey] = createSignal<string>("");
@@ -35,10 +35,10 @@ function GDriveAdd(props: Props) {
             setApiKey(e.target.value);
           }} />
         </div>
-        <GeneralAdd setName={setName} />
+        <General setName={setName} />
       </div>
     </>
   )
 }
 
-export default GDriveAdd
+export default GDrive

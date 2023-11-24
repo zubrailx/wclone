@@ -1,9 +1,9 @@
 import { Accessor, For, JSXElement, Setter, createEffect, createSignal } from "solid-js"
-import { LocalFileEncryptor } from "../../cypher/base.js"
-import { AESFileEncryptor } from "../../cypher/aes.js";
-import AESConfig from "./AESConfig.jsx";
-import { NoneFileEncryptor } from "../../cypher/none.js";
-import { storageGetCypherConfigured, storageSetCyphersConfigured } from "../../localstorage/cypher.js";
+import { LocalFileEncryptor } from "../../../cypher/base.js"
+import { AESFileEncryptor } from "../../../cypher/aes.js";
+import AESConfig from "./AES.jsx";
+import { NoneFileEncryptor } from "../../../cypher/none.js";
+import { storageGetCypherConfigured, storageSetCyphersConfigured } from "../../../localstorage/cypher.js";
 
 type Props = {
   setCypher: Setter<LocalFileEncryptor>
@@ -39,7 +39,7 @@ function setCyphers(): CypherElem[] {
   });
 }
 
-function SelectCypherSection(props: Props) {
+function Section(props: Props) {
   const cyphers = setCyphers();
   const [cypher, setCypher] = createSignal<CypherElem>(cyphers[0]);
 
@@ -74,4 +74,4 @@ function SelectCypherSection(props: Props) {
   )
 }
 
-export default SelectCypherSection
+export default Section

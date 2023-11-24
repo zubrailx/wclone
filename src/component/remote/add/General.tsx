@@ -1,5 +1,5 @@
 import { Setter } from "solid-js"
-import { DriveRemote } from "../../remote/base.js";
+import { DriveRemote } from "../../../remote/base.js";
 
 type Props = {
   setName: Setter<string>
@@ -7,7 +7,7 @@ type Props = {
 
 type CreateRemoteFN = () => DriveRemote;
 
-function GeneralAdd(props: Props) {
+function General(props: Props) {
 
   function remoteNameOnChange(e: any) {
     props.setName(e.target.value);
@@ -23,5 +23,5 @@ function GeneralAdd(props: Props) {
   )
 }
 
-export default GeneralAdd
+export default General
 export type { CreateRemoteFN };

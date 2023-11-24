@@ -1,14 +1,13 @@
 import { Setter } from "solid-js"
-import { AESFileEncryptor } from "../../cypher/aes.js"
-import { clone } from "../../utils.js"
+import { AESFileEncryptor } from "../../../cypher/aes.js"
+import { clone } from "../../../utils.js"
 
 type Props = {
   value: AESFileEncryptor,
   setValue: Setter<AESFileEncryptor>
 }
 
-function AESConfig(props: Props) {
-
+function AES(props: Props) {
   return (
     <div>
       <label>Secret Key:</label>
@@ -22,4 +21,4 @@ function AESConfig(props: Props) {
   )
 }
 
-export default AESConfig
+export default AES

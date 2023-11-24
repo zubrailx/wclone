@@ -6,7 +6,7 @@ import { Algorithm, LocalFileEncryptor } from "../../cypher/base.js";
 import Explorer, { ExplorerFunctions } from "./Explorer.jsx";
 import { Table, TableBodyRow, TableCell, TableHeadCell, TableHeadRow } from "./Table.jsx";
 import { DriveRemote } from "../../remote/base.js";
-import { useApiContext } from "./../DriveProvider.jsx";
+import { useDriveAPIContext } from "./../provider/DriveAPI.jsx";
 import { DriveFileMeta } from "../../api/base.js";
 
 type Props = {
@@ -24,7 +24,7 @@ function log(...msg: any) {
 }
 
 function LocalExplorer(props: Props) {
-  const [_, { getRequiredApi }] = useApiContext();
+  const [_, { getRequiredApi }] = useDriveAPIContext();
 
   const [selFile, setSelFile] = createSignal<EncryptableLocalFile | null>(null);
 

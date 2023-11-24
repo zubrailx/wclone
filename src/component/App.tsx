@@ -1,15 +1,15 @@
 import './App.scss'
 
-import AddRemoteSection from './remote/AddRemoteSection.jsx';
+import Section from './remote/add/Section.jsx';
 import { DriveRemote } from '../remote/base.js';
-import SelectRemoteSection from './remote/SelectRemoteSection.jsx';
-import { ApiProvider } from './DriveProvider.jsx';
+import SelectRemoteSection from './remote/select/Section.jsx';
+import { DriveAPIProvider } from './provider/DriveAPI.jsx';
 import { createStore } from 'solid-js/store';
 import { createEffect, createSignal } from 'solid-js';
 import { storageGetRemotes, storageSetRemotes } from '../localstorage/remotes.js';
 import LocalExplorer from './explorer/LocalExplorer.jsx';
 import RemoteExplorer from './explorer/RemoteExplorer.jsx';
-import SelectCypherSection from './cypher/SelectCypherSection.jsx';
+import SelectCypherSection from './cypher/select/Section.jsx';
 import { LocalFileEncryptor } from '../cypher/base.js';
 import { EncryptableLocalFile } from '../localfile.js';
 import { DriveFileMeta } from '../api/base.js';
@@ -35,8 +35,8 @@ function App() {
 
   return (
     <>
-      <ApiProvider>
-        <AddRemoteSection setRemotes={setRemotes} />
+      <DriveAPIProvider>
+        <Section setRemotes={setRemotes} />
         <SelectRemoteSection remotes={remotes} setRemotes={setRemotes} setCurRemote={setCurRemote} />
         <SelectCypherSection setCypher={setCypher} />
         <RemoteExplorer curRemote={curRemote()} cypher={cypher()}
@@ -44,7 +44,7 @@ function App() {
         <LocalExplorer curRemote={curRemote()} cypher={cypher()}
           files={files()} setFiles={setFiles} pwd={pwd()}
           isAutoEncr={isAutoEncr()} setIsAutoEncr={setIsAutoEncr} />
-      </ApiProvider>
+      </DriveAPIProvider>
     </>
   )
 }
