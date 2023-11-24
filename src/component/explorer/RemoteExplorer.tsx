@@ -18,7 +18,6 @@ type Props = {
   cypher: LocalFileEncryptor,
   pwd: DriveFileMeta[],
   setPwd: Setter<DriveFileMeta[]>,
-  setLocal: Setter<EncryptableLocalFile[]>,
   isAutoEncr: boolean,
 }
 

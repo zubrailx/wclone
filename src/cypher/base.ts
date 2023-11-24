@@ -4,6 +4,7 @@ export enum Algorithm {
   NONE_OR_UNK = 0,
   AES = 1,
   NONE = 2,
+  XOR = 3,
 }
 
 export abstract class Encryptor {
