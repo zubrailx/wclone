@@ -1,9 +1,9 @@
-import { For, Setter, Show, createEffect, createSignal } from "solid-js";
+import { For, Setter, createEffect, createSignal } from "solid-js";
 import { DriveFileMeta } from "../../api/base.js";
 import { useApiContext } from "./../DriveProvider.jsx";
 import RemoteContextMenu, { RFileCap } from "./RemoteContextMenu.jsx";
-import Explorer, { ExplorerFunctions, FILE_NOT_SELECTED } from "./Explorer.jsx";
-import { Table, TableBodyRow, TableCell, TableHeadCell, TableHeadRow, TableRow } from "./Table.jsx";
+import Explorer, { ExplorerFunctions } from "./Explorer.jsx";
+import { Table, TableBodyRow, TableCell, TableHeadCell, TableHeadRow } from "./Table.jsx";
 import { DriveRemote } from "../../remote/base.js";
 import { LocalFileEncryptor } from "../../cypher/base.js";
 import { EncryptableLocalFile } from "../../localfile.js";
