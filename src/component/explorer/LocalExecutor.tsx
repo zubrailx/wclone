@@ -13,7 +13,7 @@ type Props = {
   setIsAutoEncr: Setter<boolean>,
 }
 
-function LocalExplorer(props: Props) {
+function LocalExecutor(props: Props) {
   const [_, { getRequiredApi }] = useApiContext();
 
   let inputFile: HTMLInputElement | undefined;
@@ -77,4 +77,4 @@ function LocalExplorer(props: Props) {
   )
 }
 
-export default LocalExplorer
+export default LocalExecutor
