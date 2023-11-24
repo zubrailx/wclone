@@ -32,7 +32,7 @@ function SelectSection(props: Props) {
 
   return (
     <div>
-      <h3>Select remote</h3>
+      <h3>Remote</h3>
       <label>Existing remotes:</label>
       <select onChange={displaySelectedRemote} value={props.remote?.getName()}>
         <For each={remotes}>{(remote, _) =>

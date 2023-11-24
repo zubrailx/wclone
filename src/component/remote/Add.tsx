@@ -37,7 +37,7 @@ function Main(props: Props) {
 
   return (
     <div>
-      <h3>Add remote</h3>
+      <h3>Add</h3>
       <label>Drive backend:</label>
       <select onChange={displaySelectedRemote} value={props.drive[2].value} name="drive-backends">
         <For each={props.drives}>{(drive, _) =>

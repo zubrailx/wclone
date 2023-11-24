@@ -37,7 +37,7 @@ function SelectSection(props: Props) {
 
   return (
     <div>
-      <h3>Select cypher</h3>
+      <h3>Cypher</h3>
       <label>Algorithm:</label>
       <select onChange={displaySelectedCypher}>
         <For each={props.cyphers}>{(entry, _) =>

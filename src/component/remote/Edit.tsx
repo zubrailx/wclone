@@ -81,7 +81,7 @@ function Main(props: Props) {
 
   return (
     <div>
-      <h3>Edit remote</h3>
+      <h3>Edit</h3>
       <label>Existing remotes:</label>
       <select onChange={displaySelectedRemote} value={getRemote()?.getName()}>
         <For each={remotes}>{(remote, _) =>

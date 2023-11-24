@@ -59,14 +59,14 @@ function Main(props: Props) {
   return (
     <div>
       <h2>Options</h2>
-      <CypherSelectSection cyphers={cypherElems} cypher={getCypher()} setCypher={setCypher} />
-      <RemoteSelectSection remote={props.remote} setRemote={props.setRemote} />
       <div>
         <input type="checkbox" checked={props.encr} onChange={checkAutoEncrOnChange} />
         <span>
           Enable auto encryption
         </span>
       </div>
+      <CypherSelectSection cyphers={cypherElems} cypher={getCypher()} setCypher={setCypher} />
+      <RemoteSelectSection remote={props.remote} setRemote={props.setRemote} />
     </div>
   )
 }
