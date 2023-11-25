@@ -1,6 +1,6 @@
 import { DriveFileMeta } from "../../api/base.js";
-import { Algorithm, Encryptor } from "../../cypher/base.js";
-import { EncryptableLocalFile, LocalFile } from "../../localfile.js";
+import { Encryptor } from "../../cypher/base.js";
+import { LocalFile } from "../../localfile.js";
 import { DriveRemote } from "../../remote/base.js";
 import { useDriveAPIContext } from "../provider/DriveAPI.jsx"
 
@@ -18,7 +18,7 @@ function Main(props: Props) {
     const remote = props.remote
     if (remote != null) {
       for (const file of fileList) {
-        const efile = new EncryptableLocalFile(new LocalFile(file), Algorithm.NONE);
+        const efile = new LocalFile(file);
         getRequiredApi(remote)
           .then(api => {
             api.upload(remote, props.pwd, efile);

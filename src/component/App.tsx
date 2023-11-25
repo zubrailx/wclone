@@ -13,7 +13,6 @@ import OptionSection from './options/Main.jsx'
 import RemoteSection from './remote/Main.jsx'
 import ExecutorSection from './executor/Main.jsx'
 import ExplorerSection from './explorer/Main.jsx'
-import StatusSection from './status/Main.jsx'
 
 function App() {
   const [getRemote, setRemote] = createSignal<DriveRemote>();
@@ -32,7 +31,6 @@ function App() {
             <OptionSection cypher={getCypher()} setCypher={setCypher} remote={getRemote()} setRemote={setRemote} />
             <ExplorerSection remote={getRemote()} cypher={getCypher()!} pwd={getPwd()} setPwd={setPwd} />
             <ExecutorSection remote={getRemote()} pwd={getPwd()} cypher={getCypher()!} />
-            <StatusSection />
 
           </CypherProvider>
         </RemoteProvider>

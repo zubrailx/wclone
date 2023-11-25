@@ -1,4 +1,4 @@
-import { EncryptableLocalFile } from "../localfile.js";
+import { LocalFile } from "../localfile.js";
 import { DriveRemote } from "../remote/base.js";
 
 export interface DriveFileMeta {
@@ -13,8 +13,8 @@ export interface DriveFileMeta {
 
 export interface DriveOperations {
   list(remote: DriveRemote, pwd: DriveFileMeta[]): Promise<DriveFileMeta[]>;
-  upload(remote: DriveRemote, pwd: DriveFileMeta[], file: EncryptableLocalFile): Promise<DriveFileMeta>;
-  download(remote: DriveRemote, file: DriveFileMeta): Promise<EncryptableLocalFile>;
+  upload(remote: DriveRemote, pwd: DriveFileMeta[], file: LocalFile): Promise<DriveFileMeta>;
+  download(remote: DriveRemote, file: DriveFileMeta): Promise<LocalFile>;
   remove(remote: DriveRemote, file: DriveFileMeta): Promise<any>;
 };
 

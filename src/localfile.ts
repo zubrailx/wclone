@@ -1,5 +1,3 @@
-import { Algorithm } from "./cypher/base.js";
-
 export class LocalFile {
   file: File
 
@@ -28,16 +26,3 @@ export class LocalFile {
   }
 
 };
-
-export class EncryptableLocalFile extends LocalFile {
-  algorithm: Algorithm
-
-  constructor(localfile: LocalFile, algorithm: Algorithm) {
-    super(localfile.file);
-    this.algorithm = algorithm;
-  }
-
-  getEncryptAlgorithm() {
-    return this.algorithm;
-  }
-}

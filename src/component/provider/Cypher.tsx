@@ -1,6 +1,6 @@
 import { createStore } from "solid-js/store";
 import { createContext, useContext, createEffect } from "solid-js";
-import { LocalFileEncryptor } from "../../cypher/base.js";
+import { Encryptor } from "../../cypher/base.js";
 import { storageSetCyphersConfigured } from "../../localstorage/cypher.js"; 
 
 
@@ -11,25 +11,25 @@ type Props = {
 }
 
 type CypherContext = [
-  LocalFileEncryptor[],
+  Encryptor[],
   {
-    refresh: (curs: LocalFileEncryptor[]) => void,
-    update: (prev: LocalFileEncryptor, cur: LocalFileEncryptor) => void,
+    refresh: (curs: Encryptor[]) => void,
+    update: (prev: Encryptor, cur: Encryptor) => void,
   }
 ]
 
 function CypherProvider(props: Props) {
-  const [cyphers, setCyphers] = createStore<LocalFileEncryptor[]>([]);
+  const [cyphers, setCyphers] = createStore<Encryptor[]>([]);
 
   createEffect(() => {
     storageSetCyphersConfigured(cyphers);
   })
 
-  function refresh(curs: LocalFileEncryptor[]) {
+  function refresh(curs: Encryptor[]) {
     setCyphers(curs);
   }
 
-  function update(prev: LocalFileEncryptor, cur: LocalFileEncryptor) {
+  function update(prev: Encryptor, cur: Encryptor) {
     setCyphers(
       cyphers.map(cypher =>
         cypher == prev ? cur : cypher

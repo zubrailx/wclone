@@ -1,7 +1,6 @@
-import { Algorithm } from "../cypher/base.js";
-import { EncryptableLocalFile, LocalFile } from "../localfile.js";
+import { LocalFile } from "../localfile.js";
 import { GDriveRemote } from "../remote/gdrive.js";
-import { loadScript, readStreamChunks, until } from "../utils.js";
+import { loadScript, until } from "../utils.js";
 import { DriveFileMeta as DriveFileMeta, DriveAPI } from "./base.js";
 
 declare var gapi: any;
@@ -152,7 +151,7 @@ export class GDriveAPI implements DriveAPI {
       })
   };
 
-  public async upload(remote: GDriveRemote, pwd: DriveFileMeta[], file: EncryptableLocalFile) {
+  public async upload(remote: GDriveRemote, pwd: DriveFileMeta[], file: LocalFile) {
     const meta: Meta = {}
     const location = pwd.length == 0 ? 'root' : `${pwd[pwd.length - 1].getId()}`
     return this.initClient(remote)
@@ -191,7 +190,7 @@ export class GDriveAPI implements DriveAPI {
       })
   }
 
-  public async download(remote: GDriveRemote, file: GDriveFileMeta): Promise<EncryptableLocalFile> {
+  public async download(remote: GDriveRemote, file: GDriveFileMeta): Promise<LocalFile> {
     const meta: Meta = {};
 
     return this.initClient(remote)
@@ -220,7 +219,7 @@ export class GDriveAPI implements DriveAPI {
         return res.blob();
       })
       .then(async (res) => {
-        return new EncryptableLocalFile(new LocalFile(new File([res], meta.name!)), Algorithm.NONE);
+        return new LocalFile(new File([res], meta.name!));
       })
   }
 

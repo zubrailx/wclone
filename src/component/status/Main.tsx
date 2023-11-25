@@ -1,7 +1,3 @@
-function log(...msg: any) {
-  return console.log('[RemoteExplorer]:', ...msg)
-}
-
 type Props = {
 }
 

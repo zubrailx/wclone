@@ -1,5 +1,5 @@
 import CryptoJS from 'crypto-js';
-import { EncryptableLocalFile } from './localfile.js';
+import { LocalFile } from './localfile.js';
 
 export async function loadScript(src: string, onLoad: () => void) {
   let script = document.createElement('script');
@@ -140,7 +140,7 @@ export function mergeUint8Array(arrays: Uint8Array[]) {
   return mergedArray;
 }
 
-export function downloadFile(file: EncryptableLocalFile) {
+export function downloadFile(file: LocalFile) {
   const downloadLink = document.createElement("a");
   downloadLink.href = URL.createObjectURL(file.getFile());
   downloadLink.setAttribute('download', '');
