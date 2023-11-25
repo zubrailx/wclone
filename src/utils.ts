@@ -152,3 +152,8 @@ export function downloadFile(file: LocalFile) {
   document.body.removeChild(downloadLink);
 }
 
+export function stringToUint8Array(str: string) {
+  const utf8EncodeText = new TextEncoder();
+  return utf8EncodeText.encode(str);
+}
+

@@ -5,11 +5,20 @@ export class NoneFileEncryptor extends Encryptor {
     super(Algorithm.NONE);
   }
 
-  async encrypt(dataArr: Uint8Array[]) {
+  async encrypt(dataArr: Uint8Array) {
     return dataArr;
   }
 
-  async decrypt(dataArr: Uint8Array[]) {
+  async decrypt(dataArr: Uint8Array) {
     return dataArr;
   }
+
+  async encryptList(dataArr: Uint8Array[]) {
+    return dataArr;
+  }
+
+  async decryptList(dataArr: Uint8Array[]) {
+    return dataArr;
+  }
+
 }

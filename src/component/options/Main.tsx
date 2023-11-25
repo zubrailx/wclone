@@ -5,10 +5,12 @@ import { CypherElem, CypherEntry } from "./Cypher.jsx"
 import { storageGetCypherConfigured } from "../../localstorage/cypher.js"
 import { NoneFileEncryptor } from "../../cypher/none.js"
 import { AESEncryptor } from "../../cypher/aes.js"
-import AESConfig from "./cypher/AES.jsx"
+import AES from "./cypher/AES.jsx"
+import XOR from "./cypher/XOR.jsx"
 import { Encryptor } from "../../cypher/base.js"
 import { DriveRemote } from "../../remote/base.js"
 import { useCypherContext } from "../provider/Cypher.jsx"
+import { XOREncryptor } from "../../cypher/xor.js"
 
 
 type Props = {
@@ -21,7 +23,8 @@ type Props = {
 function setCyphers(): CypherElem[] {
   const cypherEncrytors: [Encryptor, string, (props: any) => JSXElement][] = [
     [new NoneFileEncryptor(), "None", () => <div></div>],
-    [new AESEncryptor("secret"), "AES Passphrase(256)", AESConfig],
+    [new AESEncryptor("secret"), "AES Passphrase(256)", AES],
+    [new XOREncryptor("secret"), "XOR", XOR],
   ]
 
   return cypherEncrytors.map((encryptor) => {

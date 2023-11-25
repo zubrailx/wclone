@@ -69,7 +69,7 @@ function Main(props: Props) {
 
   async function apiDownload(remote: DriveRemote, file: DriveFileMeta) {
     return getRequiredApi(remote)
-      .then(api => api.download(remote, file))
+      .then(api => api.download(remote, file, props.cypher))
   }
 
   async function apiRemove(remote: DriveRemote, file: DriveFileMeta) {

@@ -1,3 +1,4 @@
+import { Encryptor } from "../cypher/base.js";
 import { LocalFile } from "../localfile.js";
 import { DriveRemote } from "../remote/base.js";
 
@@ -13,8 +14,8 @@ export interface DriveFileMeta {
 
 export interface DriveOperations {
   list(remote: DriveRemote, pwd: DriveFileMeta[]): Promise<DriveFileMeta[]>;
-  upload(remote: DriveRemote, pwd: DriveFileMeta[], file: LocalFile): Promise<DriveFileMeta>;
-  download(remote: DriveRemote, file: DriveFileMeta): Promise<LocalFile>;
+  upload(remote: DriveRemote, pwd: DriveFileMeta[], file: LocalFile, encryptor: Encryptor): Promise<DriveFileMeta>;
+  download(remote: DriveRemote, file: DriveFileMeta, encryptor: Encryptor): Promise<LocalFile>;
   remove(remote: DriveRemote, file: DriveFileMeta): Promise<any>;
 };
 

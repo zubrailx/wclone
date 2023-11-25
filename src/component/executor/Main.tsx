@@ -21,7 +21,7 @@ function Main(props: Props) {
         const efile = new LocalFile(file);
         getRequiredApi(remote)
           .then(api => {
-            api.upload(remote, props.pwd, efile);
+            api.upload(remote, props.pwd, efile, props.cypher);
           })
       }
     }

@@ -1,3 +1,4 @@
+import { Encryptor } from "../cypher/base.js";
 import { LocalFile } from "../localfile.js";
 import { GDriveRemote } from "../remote/gdrive.js";
 import { loadScript, until } from "../utils.js";
@@ -151,7 +152,7 @@ export class GDriveAPI implements DriveAPI {
       })
   };
 
-  public async upload(remote: GDriveRemote, pwd: DriveFileMeta[], file: LocalFile) {
+  public async upload(remote: GDriveRemote, pwd: DriveFileMeta[], file: LocalFile, encryptor: Encryptor) {
     const meta: Meta = {}
     const location = pwd.length == 0 ? 'root' : `${pwd[pwd.length - 1].getId()}`
     return this.initClient(remote)
@@ -172,15 +173,18 @@ export class GDriveAPI implements DriveAPI {
         meta.name = res.result.name;
         meta.size = Number(res.result.size);
         meta.mimeType = res.result.mimeType;
-        return await fetch(
-          `https://www.googleapis.com/upload/drive/v3/files/${res.result.id}`, {
-          method: 'PATCH',
-          headers: new Headers({
-            'Authorization': `Bearer ${gapi.client.getToken().access_token}`,
-            'Content-Type': file.getMimeType()
-          }),
-          body: file.file
-        });
+        return encryptor.encrypt(new Uint8Array(await file.getFile().arrayBuffer()))
+          .then(data =>
+            fetch(
+              `https://www.googleapis.com/upload/drive/v3/files/${res.result.id}`, {
+              method: 'PATCH',
+              headers: new Headers({
+                'Authorization': `Bearer ${gapi.client.getToken().access_token}`,
+                'Content-Type': file.getMimeType()
+              }),
+              body: data
+            })
+          )
       })
       .then((_) => {
         meta.size = file.getSize();
@@ -190,7 +194,7 @@ export class GDriveAPI implements DriveAPI {
       })
   }
 
-  public async download(remote: GDriveRemote, file: GDriveFileMeta): Promise<LocalFile> {
+  public async download(remote: GDriveRemote, file: GDriveFileMeta, encryptor: Encryptor): Promise<LocalFile> {
     const meta: Meta = {};
 
     return this.initClient(remote)
@@ -217,8 +221,12 @@ export class GDriveAPI implements DriveAPI {
         });
       }).then((res) => {
         return res.blob();
+      }).then(async (blob) => {
+        return new Uint8Array(await blob.arrayBuffer())
+      }).then((blob) => {
+        return encryptor.decrypt(blob)
       })
-      .then(async (res) => {
+      .then(res => {
         return new LocalFile(new File([res], meta.name!));
       })
   }
