@@ -9,6 +9,7 @@
 .table {
   .row {
     display: table-row;
+    cursor: context-menu;
     .cell {
       display: table-cell;
       border-style: solid;
@@ -41,7 +42,7 @@
   }
 }
 
-.contextmenu {
+.actionmenu {
   width: max-content;
   position: absolute;
   z-index: 10;

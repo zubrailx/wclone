@@ -4,10 +4,7 @@ import { DriveRemote } from "../../remote/base.js";
 import { Encryptor } from "../../cypher/base.js";
 import { useDriveAPIContext } from "../provider/DriveAPI.jsx";
 import { downloadFile } from "../../utils.js";
-
-function log(...msg: any) {
-  return console.log('[RemoteExplorer]:', ...msg)
-}
+import ActionMenu, { Action, CMPosition } from "./ActionMenu.jsx";
 
 type Props = {
   remote: DriveRemote | undefined,
@@ -25,13 +22,33 @@ function Main(props: Props) {
   const [getSelFiles, setSelFiles] = createSignal<DriveFileMeta[]>([],
     { equals: false });
 
+  const [getCMSelFile, setCMSelFile] = createSignal<DriveFileMeta>();
+  const [getActions, setActions] = createSignal<Action[]>([]);
+  const [getCMPos, setCMPos] = createSignal<CMPosition>([0, 0], { equals: false });
+  const [getCMVisible, setCMVisible] = createSignal<boolean>(false);
+
   createEffect(() => {
     const _ = getFiles();
-    unselectFiles();
+    unselectAll();
   })
 
-  function unselectFiles() {
+  createEffect(() => {
+    if (getCMSelFile() === undefined) {
+      setCMVisible(false);
+    }
+  })
+
+  function unselectAll() {
+    unselectCheckbox()
+    unselectAction()
+  }
+
+  function unselectCheckbox() {
     setSelFiles([]);
+  }
+
+  function unselectAction() {
+    setCMSelFile(undefined);
   }
 
   const columns = ["", "Name", "Size", "Created Time", "Mime Type"]
@@ -44,11 +61,26 @@ function Main(props: Props) {
     ]
   }
 
+  async function apiList(remote: DriveRemote, pwd: DriveFileMeta[]) {
+    return getRequiredApi(remote)
+      .then(api => api.list(remote, pwd))
+  }
+
+  async function apiDownload(remote: DriveRemote, file: DriveFileMeta) {
+    return getRequiredApi(remote)
+      .then(api => api.download(remote, file))
+  }
+
+  async function apiRemove(remote: DriveRemote, file: DriveFileMeta) {
+    return getRequiredApi(remote)
+      .then(api => api.remove(remote, file))
+  }
+
+
   function refreshOnClick() {
     const remote = props.remote;
     if (remote != null) {
-      getRequiredApi(remote)
-        .then(api => api.list(remote, props.pwd))
+      apiList(remote, props.pwd)
         .then(files => setFiles(files))
         .catch(e => alert(JSON.stringify(e)));
     }
@@ -56,32 +88,27 @@ function Main(props: Props) {
 
   function downloadSelectedOnClick() {
     const remote = props.remote;
+    const selFiles = getSelFiles();
     if (remote != null) {
-      const selFiles = getSelFiles();
-      unselectFiles();
-      getRequiredApi(remote)
-        .then(api => {
-          for (const file of selFiles) {
-            api.download(remote, file)
-              .then(file => downloadFile(file))
-              .catch(e => console.error(e))
-          }
-        })
+      unselectCheckbox();
+      for (const file of selFiles) {
+        apiDownload(remote, file)
+          .then(file => downloadFile(file))
+          .catch(e => console.error(e))
+      }
     }
   }
 
   function removeSelectedOnClick() {
     const remote = props.remote;
+    const selFiles = getSelFiles();
     if (remote != null) {
-      const selFiles = getSelFiles();
-      unselectFiles();
-      getRequiredApi(remote)
-        .then(api => {
-          for (const file of selFiles) {
-            api.remove(remote, file)
-              .catch(e => console.error(e))
-          }
-        })
+      unselectCheckbox();
+      for (const file of selFiles) {
+        apiRemove(remote, file)
+          .catch(e => console.error(e))
+
+      }
     }
   }
 
@@ -100,20 +127,88 @@ function Main(props: Props) {
     return getFiles().length == 0;
   }
 
-  function cdRootOnClick() {
+  function cdRoot() {
     props.setPwd([])
     refreshOnClick()
   }
 
-  function cdNodeOnClick(node: DriveFileMeta) {
+  function cdNodeBack(node: DriveFileMeta) {
     return function() {
       const idx = props.pwd.indexOf(node);
       props.setPwd(pwd => pwd.slice(idx));
+      refreshOnClick();
     }
+  }
+
+  function cdNodeFront(node: DriveFileMeta) {
+    props.setPwd(pwd => [...pwd, node]);
+    refreshOnClick();
   }
 
   function isChecked(file: DriveFileMeta) {
     return getSelFiles().includes(file);
+  }
+
+  function actionMenuOnContextMenu(file: DriveFileMeta) {
+    return function(ev: MouseEvent) {
+      ev.preventDefault();
+      ev.stopPropagation();
+
+      setCMSelFile(file);
+      setCMVisible(true);
+      setCMPos([ev.pageX + 1, ev.pageY + 1])
+    }
+  }
+
+  enum ActionEnum {
+    DOWNLOAD = 1,
+    REMOVE = 2,
+    CHANGE_DIRECTORY = 3
+  }
+
+  const allActions: { [key in ActionEnum]: Action } = {
+    [ActionEnum.DOWNLOAD]: new Action("Download", function(file) {
+      return function(_: Event) {
+        unselectAction()
+        if (props.remote) {
+          apiDownload(props.remote, file)
+            .then(file => downloadFile(file))
+            .catch(e => JSON.stringify(e))
+        }
+      }
+    }),
+    [ActionEnum.REMOVE]: new Action("Remove", function(file) {
+      return function(_: Event) {
+        unselectAction()
+        if (props.remote) {
+          apiRemove(props.remote, file)
+            .catch(e => JSON.stringify(e))
+        }
+      }
+    }),
+    [ActionEnum.CHANGE_DIRECTORY]: new Action("Change Directory", function(file) {
+      return function(_: Event) {
+        unselectAction()
+        if (props.remote) {
+          cdNodeFront(file);
+        }
+      }
+    })
+  };
+
+  function getCMActions() {
+    const file = getCMSelFile();
+    if (file === undefined) {
+      return []
+    } else if (file.isFolder()) {
+      return [
+        allActions[ActionEnum.CHANGE_DIRECTORY]
+      ]
+    }
+    return [
+      allActions[ActionEnum.DOWNLOAD],
+      allActions[ActionEnum.REMOVE],
+    ]
   }
 
   return (
@@ -123,9 +218,9 @@ function Main(props: Props) {
         <button onClick={refreshOnClick}>Refresh</button>
         <span>Working directory: </span>
         <span>
-          <button onClick={cdRootOnClick}>/</button>
+          <button onClick={cdRoot}>/</button>
           <For each={props.pwd}>{(node, _) =>
-            <button onClick={cdNodeOnClick(node)}>{node.getName()}</button>
+            <button onClick={cdNodeBack(node)}>{node.getName()}</button>
           }</For>
         </span>
       </div>
@@ -141,7 +236,7 @@ function Main(props: Props) {
           }</For>
         </div>
         <For each={getFiles()}>{(file, _) =>
-          <div class="row body">
+          <div class="row body" onContextMenu={actionMenuOnContextMenu(file)}>
             <div class="cell body">
               <input type="checkbox" onChange={tableRowOnChange(file)} checked={isChecked(file)}></input>
             </div>
@@ -151,6 +246,7 @@ function Main(props: Props) {
           </div>
         }</For>
       </div>
+      <ActionMenu actions={getCMActions()} selFile={getCMSelFile()!} visible={getCMVisible()} position={getCMPos()} />
     </div>
   )
 }
