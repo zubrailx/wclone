@@ -20,7 +20,7 @@ export class LocalFile {
   }
 
   getModifiedTime() {
-    return this.file.lastModified;
+    return new Date(this.file.lastModified);
   }
 
   getFile() {

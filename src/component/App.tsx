@@ -15,29 +15,30 @@ import ExecutorSection from './executor/Main.jsx'
 import ExplorerSection from './explorer/Main.jsx'
 import StatusSection from './status/Main.jsx'
 
-  function App() {
-    const [getRemote, setRemote] = createSignal<DriveRemote>();
-    const [getCypher, setCypher] = createSignal<Encryptor>();
+function App() {
+  const [getRemote, setRemote] = createSignal<DriveRemote>();
 
-    const [getPwd, setPwd] = createSignal<DriveFileMeta[]>([], { equals: false });
+  const [getCypher, setCypher] = createSignal<Encryptor>();
 
-    return (
-      <>
-        <DriveAPIProvider>
-          <RemoteProvider>
-            <CypherProvider>
+  const [getPwd, setPwd] = createSignal<DriveFileMeta[]>([], { equals: false });
 
-              <RemoteSection />
-              <OptionSection cypher={getCypher()} setCypher={setCypher} remote={getRemote()} setRemote={setRemote} />
-              <ExplorerSection remote={getRemote()} cypher={getCypher()!} pwd={getPwd()} setPwd={setPwd} />
-              <ExecutorSection remote={getRemote()} pwd={getPwd()} cypher={getCypher()!} />
-              <StatusSection />
+  return (
+    <>
+      <DriveAPIProvider>
+        <RemoteProvider>
+          <CypherProvider>
 
-            </CypherProvider>
-          </RemoteProvider>
-        </DriveAPIProvider>
-      </>
-    )
-  }
+            <RemoteSection />
+            <OptionSection cypher={getCypher()} setCypher={setCypher} remote={getRemote()} setRemote={setRemote} />
+            <ExplorerSection remote={getRemote()} cypher={getCypher()!} pwd={getPwd()} setPwd={setPwd} />
+            <ExecutorSection remote={getRemote()} pwd={getPwd()} cypher={getCypher()!} />
+            <StatusSection />
+
+          </CypherProvider>
+        </RemoteProvider>
+      </DriveAPIProvider>
+    </>
+  )
+}
 
 export default App

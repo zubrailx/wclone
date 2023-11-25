@@ -33,7 +33,6 @@ function Main(props: Props) {
 
   function displaySelectedRemote(e: SelectEvent) {
     const entry = findRemoteByValue(e.target.value)!;
-    console.log("selected remote:", entry);
     setRemote(entry);
   }
 

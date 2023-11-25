@@ -1,4 +1,4 @@
-import { For, Setter, createEffect } from "solid-js"
+import { For, Setter, createEffect, createSignal } from "solid-js"
 import { DriveRemote } from "../../remote/base.js"
 import { useRemoteContext } from "../provider/Remote.jsx";
 
@@ -14,11 +14,22 @@ type SelectEvent = Event & {
 
 function SelectSection(props: Props) {
   const [remotes, { }] = useRemoteContext();
+  const [getRemote, setRemote] = createSignal<DriveRemote>();
 
   createEffect(() => {
-    if (remotes.length > 0 && props.remote === undefined) {
-      props.setRemote(remotes[0]);
+    let cur;
+    const prev = getRemote();
+    if (prev !== undefined) {
+      cur = remotes.find(rem => prev.getName() === rem.getName());
     }
+    if (cur === undefined && remotes.length > 0 && props.remote === undefined) {
+      cur = remotes[0];
+    }
+    setRemote(cur);
+  })
+
+  createEffect(() => {
+    props.setRemote(getRemote());
   })
 
   function findRemoteByValue(value: string) {

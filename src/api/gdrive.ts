@@ -15,7 +15,7 @@ type Meta = {
   createdTime?: Date
 };
 
-class GDriveFileMeta implements DriveFileMeta {
+export class GDriveFileMeta implements DriveFileMeta {
   id: string;
   name: string;
   size: number;
@@ -169,7 +169,6 @@ export class GDriveAPI implements DriveAPI {
         })
       })
       .then(async (res: any) => {
-        const data = new Blob(file.getContent(), { type: file.getMimeType() });
         meta.id = res.result.id;
         meta.name = res.result.name;
         meta.size = Number(res.result.size);
@@ -181,7 +180,7 @@ export class GDriveAPI implements DriveAPI {
             'Authorization': `Bearer ${gapi.client.getToken().access_token}`,
             'Content-Type': file.getMimeType()
           }),
-          body: data
+          body: file.file
         });
       })
       .then((_) => {
@@ -221,9 +220,7 @@ export class GDriveAPI implements DriveAPI {
         return res.blob();
       })
       .then(async (res) => {
-        const chunks = await readStreamChunks(res.stream());
-        return new EncryptableLocalFile(
-          new LocalFile(meta.name!, meta.size!, meta.mimeType!, meta.createdTime!, chunks), Algorithm.NONE_OR_UNK);
+        return new EncryptableLocalFile(new LocalFile(new File([res], meta.name!)), Algorithm.NONE);
       })
   }
 
@@ -237,5 +234,4 @@ export class GDriveAPI implements DriveAPI {
         return res;
       })
   }
-
 }
