@@ -1,4 +1,4 @@
-import { For, Setter, createEffect, createSignal } from "solid-js";
+import { For, Setter, createEffect, createSignal, onCleanup } from "solid-js";
 import { DriveFileMeta } from "../../api/base.js";
 import { DriveRemote } from "../../remote/base.js";
 import { Encryptor } from "../../cypher/base.js";
@@ -23,9 +23,10 @@ function Main(props: Props) {
     { equals: false });
 
   const [getCMSelFile, setCMSelFile] = createSignal<DriveFileMeta>();
-  const [getActions, setActions] = createSignal<Action[]>([]);
   const [getCMPos, setCMPos] = createSignal<CMPosition>([0, 0], { equals: false });
   const [getCMVisible, setCMVisible] = createSignal<boolean>(false);
+
+  let table : HTMLDivElement | undefined;
 
   createEffect(() => {
     const _ = getFiles();
@@ -152,13 +153,44 @@ function Main(props: Props) {
   function actionMenuOnContextMenu(file: DriveFileMeta) {
     return function(ev: MouseEvent) {
       ev.preventDefault();
-      ev.stopPropagation();
+
+      window.addEventListener('contextmenu', unselectForContextMenu);
+      window.addEventListener('click', unselectForClick);
 
       setCMSelFile(file);
       setCMVisible(true);
       setCMPos([ev.pageX + 1, ev.pageY + 1])
     }
+
   }
+
+  function unselectForContextMenu(ev: MouseEvent) {
+    const x = ev.clientX;
+    const y = ev.clientY;
+    const elementsUnder = document.elementsFromPoint(x, y);
+    for (const elem of elementsUnder) {
+      if (elem == table) {
+        return;
+      }
+    }
+    setCMVisible(false);
+  }
+
+  function unselectForClick(ev: MouseEvent) {
+    setCMVisible(false);
+  }
+
+  createEffect(() => {
+    if (getCMVisible() == false) {
+      window.removeEventListener('contextmenu', unselectForContextMenu);
+      window.removeEventListener('click', unselectForClick);
+    }
+  })
+
+  onCleanup(() => {
+    window.removeEventListener('contextmenu', unselectForContextMenu);
+    window.removeEventListener('click', unselectForClick);
+  })
 
   enum ActionEnum {
     DOWNLOAD = 1,
@@ -229,7 +261,7 @@ function Main(props: Props) {
         <button onClick={downloadSelectedOnClick}>Download</button>
         <button onClick={removeSelectedOnClick}>Remove</button>
       </div>
-      <div class="table">
+      <div class="table" ref={table}>
         <div class="row head" style={{ display: tableEmpty() ? "none" : "" }}>
           <For each={columns}>{(column, _) =>
             <div class="cell head">{column} </div>
