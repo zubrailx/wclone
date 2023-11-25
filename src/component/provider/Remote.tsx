@@ -24,7 +24,6 @@ function RemoteProvider(props: Props) {
 
   createEffect(() => {
     storageSetRemotes(remotes);
-    console.log(remotes);
   })
 
   function addRemote(cur: DriveRemote) {
