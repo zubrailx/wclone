@@ -1,10 +1,10 @@
 import { Setter } from "solid-js"
-import { AESFileEncryptor } from "../../../cypher/aes.js"
+import { AESEncryptor } from "../../../cypher/aes.js"
 import { clone } from "../../../utils.js"
 
 type Props = {
-  value: AESFileEncryptor,
-  setValue: Setter<AESFileEncryptor>
+  value: AESEncryptor,
+  setValue: Setter<AESEncryptor>
 }
 
 function AES(props: Props) {

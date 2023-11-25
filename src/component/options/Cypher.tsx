@@ -1,5 +1,5 @@
 import { For, JSXElement, Setter, Accessor } from "solid-js"
-import { LocalFileEncryptor } from "../../cypher/base.js"
+import { Encryptor } from "../../cypher/base.js"
 
 class CypherEntry {
   text: string;
@@ -11,7 +11,7 @@ class CypherEntry {
   }
 }
 
-type CypherElem = [Accessor<LocalFileEncryptor>, Setter<LocalFileEncryptor>, CypherEntry];
+type CypherElem = [Accessor<Encryptor>, Setter<Encryptor>, CypherEntry];
 
 type SelectEvent = Event & {
   currentTarget: HTMLSelectElement;

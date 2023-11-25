@@ -1,9 +1,9 @@
-import { AESFileEncryptor } from "../cypher/aes.js";
-import { LocalFileEncryptor } from "../cypher/base.js";
+import { AESEncryptor } from "../cypher/aes.js";
+import { Encryptor } from "../cypher/base.js";
 import { clone } from "../utils.js";
 import { STORAGE_AUTO_ENCRYPTION, STORAGE_CYPHER_KEY } from "./general.js";
 
-export function storageGetCypherConfigured(_encr: LocalFileEncryptor): LocalFileEncryptor {
+export function storageGetCypherConfigured(_encr: Encryptor): Encryptor {
   const _item = window.localStorage.getItem(STORAGE_CYPHER_KEY)
   const encr = clone(_encr);
   if (_item == null) {
@@ -11,10 +11,10 @@ export function storageGetCypherConfigured(_encr: LocalFileEncryptor): LocalFile
   }
   const item = JSON.parse(_item);
 
-  if (_encr instanceof AESFileEncryptor) {
+  if (_encr instanceof AESEncryptor) {
     const elem = item["aes"]
     if (elem != null) {
-      const aes: AESFileEncryptor = encr as AESFileEncryptor;
+      const aes: AESEncryptor = encr as AESEncryptor;
       aes.secretKey = elem.secretKey;
     }
   }
@@ -22,11 +22,11 @@ export function storageGetCypherConfigured(_encr: LocalFileEncryptor): LocalFile
   return encr;
 }
 
-export function storageGetCyphersConfigured(encrs: LocalFileEncryptor[]): LocalFileEncryptor[] {
+export function storageGetCyphersConfigured(encrs: Encryptor[]): Encryptor[] {
   return encrs.map(encr => storageGetCypherConfigured(encr));
 }
 
-export function storageSetCypherConfigured(encr: LocalFileEncryptor) {
+export function storageSetCypherConfigured(encr: Encryptor) {
   const _item = window.localStorage.getItem(STORAGE_CYPHER_KEY);
   let item;
   if (_item == null) {
@@ -35,7 +35,7 @@ export function storageSetCypherConfigured(encr: LocalFileEncryptor) {
     item = JSON.parse(_item);
   }
 
-  if (encr instanceof AESFileEncryptor) {
+  if (encr instanceof AESEncryptor) {
     if (item["aes"] == null) {
       item["aes"] = {}
     }
@@ -45,7 +45,7 @@ export function storageSetCypherConfigured(encr: LocalFileEncryptor) {
   window.localStorage.setItem(STORAGE_CYPHER_KEY, JSON.stringify(item));
 }
 
-export function storageSetCyphersConfigured(encrs: LocalFileEncryptor[]) {
+export function storageSetCyphersConfigured(encrs: Encryptor[]) {
   encrs.forEach(encr => {
     storageSetCypherConfigured(encr);
   });

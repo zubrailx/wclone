@@ -1,58 +1,39 @@
 import { Algorithm } from "./cypher/base.js";
-import { readStreamChunks } from "./utils.js";
 
 export class LocalFile {
-  name: string;
-  mimeType: string;
-  size: number;
-  lastModified: Date;
-  content: Uint8Array[];
+  file: File
 
-  constructor(name: string, size: number, mimeType: string, lastModified: Date, content: Uint8Array[]) {
-    this.name = name;
-    this.size = size;
-    this.mimeType = mimeType;
-    this.lastModified = lastModified;
-    this.content = content;
+  constructor(file: File) {
+    this.file = file
   }
 
   getName() {
-    return this.name;
+    return this.file.name;
   }
 
   getSize() {
-    return this.size;
+    return this.file.size;
   }
 
   getMimeType() {
-    return this.mimeType;
+    return this.file.type;
   }
 
   getModifiedTime() {
-    return this.lastModified;
+    return this.file.lastModified;
   }
 
-  getContent(): Uint8Array[] {
-    return this.content;
+  getFile() {
+    return this.file;
   }
 
-  toFile(): File {
-    return new File(this.content, this.getName(), { type: this.mimeType, lastModified: this.lastModified.getTime() });
-  }
 };
-
-export async function fromFile(file: File): Promise<LocalFile> {
-  const content = await readStreamChunks(file.stream());
-  return new LocalFile(file.name, file.size, file.type, new Date(file.lastModified), content);
-}
-
 
 export class EncryptableLocalFile extends LocalFile {
   algorithm: Algorithm
 
   constructor(localfile: LocalFile, algorithm: Algorithm) {
-    super(localfile.getName(), localfile.getSize(), localfile.getMimeType(),
-      localfile.getModifiedTime(), localfile.getContent());
+    super(localfile.file);
     this.algorithm = algorithm;
   }
 

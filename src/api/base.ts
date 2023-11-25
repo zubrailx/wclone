@@ -25,3 +25,4 @@ export interface DriveAPI extends DriveOperations {
   access(remote: DriveRemote, callback: Function): Promise<void>;
   revoke(remote: DriveRemote): Promise<void>;
 };
+

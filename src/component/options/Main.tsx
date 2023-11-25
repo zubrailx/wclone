@@ -4,26 +4,24 @@ import RemoteSelectSection from "./Remote.jsx"
 import { CypherElem, CypherEntry } from "./Cypher.jsx"
 import { storageGetCypherConfigured } from "../../localstorage/cypher.js"
 import { NoneFileEncryptor } from "../../cypher/none.js"
-import { AESFileEncryptor } from "../../cypher/aes.js"
+import { AESEncryptor } from "../../cypher/aes.js"
 import AESConfig from "./cypher/AES.jsx"
-import { LocalFileEncryptor } from "../../cypher/base.js"
+import { Encryptor } from "../../cypher/base.js"
 import { DriveRemote } from "../../remote/base.js"
 import { useCypherContext } from "../provider/Cypher.jsx"
 
 
 type Props = {
-  cypher: LocalFileEncryptor | undefined,
-  setCypher: Setter<LocalFileEncryptor | undefined>,
+  cypher: Encryptor | undefined,
+  setCypher: Setter<Encryptor | undefined>,
   remote: DriveRemote | undefined,
   setRemote: Setter<DriveRemote | undefined>,
-  encr: boolean,
-  setEncr: Setter<boolean>,
 }
 
 function setCyphers(): CypherElem[] {
-  const cypherEncrytors: [LocalFileEncryptor, string, (props: any) => JSXElement][] = [
+  const cypherEncrytors: [Encryptor, string, (props: any) => JSXElement][] = [
     [new NoneFileEncryptor(), "None", () => <div></div>],
-    [new AESFileEncryptor("secret"), "AES Passphrase(256)", AESConfig],
+    [new AESEncryptor("secret"), "AES Passphrase(256)", AESConfig],
   ]
 
   return cypherEncrytors.map((encryptor) => {
@@ -52,19 +50,9 @@ function Main(props: Props) {
   })
 
 
-  function checkAutoEncrOnChange() {
-    props.setEncr((val) => !val);
-  }
-
   return (
     <div>
       <h2>Options</h2>
-      <div>
-        <input type="checkbox" checked={props.encr} onChange={checkAutoEncrOnChange} />
-        <span>
-          Enable auto encryption
-        </span>
-      </div>
       <CypherSelectSection cyphers={cypherElems} cypher={getCypher()} setCypher={setCypher} />
       <RemoteSelectSection remote={props.remote} setRemote={props.setRemote} />
     </div>

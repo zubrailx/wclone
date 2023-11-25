@@ -1,9 +1,9 @@
 import { CryptJsWordArrayToUint8Array, Uint8ArrayToCryptJsWordArray, base64ToBytes, bytesToBase64, mergeUint8Array } from "../utils.js";
-import { Algorithm, LocalFileEncryptor } from "./base.js";
+import { Algorithm, Encryptor } from "./base.js";
 
 import CryptoJS from 'crypto-js';
 
-class AESFileEncryptor extends LocalFileEncryptor {
+class AESEncryptor extends Encryptor {
   secretKey: string
 
   constructor(secretKey: string) {
@@ -11,8 +11,9 @@ class AESFileEncryptor extends LocalFileEncryptor {
     this.secretKey = secretKey;
   }
 
-  // NOTE: need to merge arrays because salt would be added in the beginning
-  // to execute really in background, need to use Workers
+  /*
+   * need to merge array before execution (salt is added)
+   */
   async encrypt(dataArr: Uint8Array[]): Promise<Uint8Array[]> {
     const data: Uint8Array = mergeUint8Array(dataArr);
     const dataWordArr = Uint8ArrayToCryptJsWordArray(data);
@@ -21,6 +22,9 @@ class AESFileEncryptor extends LocalFileEncryptor {
     return [u8Arr]
   }
 
+  /*
+   * need to merge array before execution (salt is added)
+   */
   async decrypt(dataArr: Uint8Array[]): Promise<Uint8Array[]> {
     return new Promise(resolve => {
       setTimeout(resolve, 0, null)
@@ -35,4 +39,4 @@ class AESFileEncryptor extends LocalFileEncryptor {
 }
 
 
-export { AESFileEncryptor };
+export { AESEncryptor };

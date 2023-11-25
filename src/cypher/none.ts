@@ -1,6 +1,6 @@
-import { Algorithm, LocalFileEncryptor } from "./base.js";
+import { Algorithm, Encryptor } from "./base.js";
 
-export class NoneFileEncryptor extends LocalFileEncryptor {
+export class NoneFileEncryptor extends Encryptor {
   constructor() {
     super(Algorithm.NONE);
   }
